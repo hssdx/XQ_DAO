@@ -1,0 +1,595 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0EEF768A5F65CA1BED8DBDE2 /* libPods-XQ_DAO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 056FC273F0A4A7AF8F8639B0 /* libPods-XQ_DAO.a */; };
+		9815CF451F39B22600FD7F6C /* XQ_DAO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9815CF3B1F39B22500FD7F6C /* XQ_DAO.framework */; };
+		9815CF4A1F39B22600FD7F6C /* XQ_DAOTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9815CF491F39B22600FD7F6C /* XQ_DAOTests.m */; };
+		9815CF4C1F39B22600FD7F6C /* XQ_DAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 9815CF3E1F39B22500FD7F6C /* XQ_DAO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9875FD791F3B50C100136FEC /* NSObject+XQ_DAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */; };
+		9875FD7A1F3B50C100136FEC /* NSObject+XQ_DAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */; };
+		9875FD7B1F3B50C100136FEC /* NSObject+XQProtect.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */; };
+		9875FD7C1F3B50C100136FEC /* XQModelBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD651F3B50C100136FEC /* XQModelBlocks.h */; };
+		9875FD7D1F3B50C100136FEC /* XQEntityUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD661F3B50C100136FEC /* XQEntityUtils.h */; };
+		9875FD7E1F3B50C100136FEC /* XQMigrationItemBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD681F3B50C100136FEC /* XQMigrationItemBase.h */; };
+		9875FD7F1F3B50C100136FEC /* XQMigrationItemBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD691F3B50C100136FEC /* XQMigrationItemBase.m */; };
+		9875FD801F3B50C100136FEC /* XQMigrationService.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD6A1F3B50C100136FEC /* XQMigrationService.h */; };
+		9875FD811F3B50C100136FEC /* XQMigrationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD6B1F3B50C100136FEC /* XQMigrationService.m */; };
+		9875FD821F3B50C100136FEC /* XQMigrationItemBase+Protect.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD6C1F3B50C100136FEC /* XQMigrationItemBase+Protect.h */; };
+		9875FD831F3B50C100136FEC /* XQDatabaseQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD6F1F3B50C100136FEC /* XQDatabaseQueue.h */; };
+		9875FD841F3B50C100136FEC /* XQDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD701F3B50C100136FEC /* XQDatabaseQueue.m */; };
+		9875FD851F3B50C100136FEC /* XQFMDBManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD711F3B50C100136FEC /* XQFMDBManager.h */; };
+		9875FD861F3B50C100136FEC /* XQFMDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD721F3B50C100136FEC /* XQFMDBManager.m */; };
+		9875FD871F3B50C100136FEC /* XQSQLCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD731F3B50C100136FEC /* XQSQLCondition.h */; };
+		9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD741F3B50C100136FEC /* XQSQLCondition.m */; };
+		9875FD891F3B50C100136FEC /* NSArray+XQUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */; };
+		9875FD8A1F3B50C100136FEC /* NSArray+XQUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */; };
+		9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */; };
+		9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9815CF461F39B22600FD7F6C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9815CF321F39B22500FD7F6C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9815CF3A1F39B22500FD7F6C;
+			remoteInfo = XQ_DAO;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		056FC273F0A4A7AF8F8639B0 /* libPods-XQ_DAO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-XQ_DAO.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		48490A1210FB82D4F5138F9D /* Pods-XQ_DAO.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XQ_DAO.debug.xcconfig"; path = "Pods/Target Support Files/Pods-XQ_DAO/Pods-XQ_DAO.debug.xcconfig"; sourceTree = "<group>"; };
+		95098156C257E8D4D94D19F6 /* Pods-XQ_DAO.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XQ_DAO.release.xcconfig"; path = "Pods/Target Support Files/Pods-XQ_DAO/Pods-XQ_DAO.release.xcconfig"; sourceTree = "<group>"; };
+		9815CF3B1F39B22500FD7F6C /* XQ_DAO.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XQ_DAO.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9815CF3E1F39B22500FD7F6C /* XQ_DAO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XQ_DAO.h; sourceTree = "<group>"; };
+		9815CF3F1F39B22500FD7F6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9815CF441F39B22600FD7F6C /* XQ_DAOTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XQ_DAOTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9815CF491F39B22600FD7F6C /* XQ_DAOTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XQ_DAOTests.m; sourceTree = "<group>"; };
+		9815CF4B1F39B22600FD7F6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9833D3BA1F3B4B900012A8B7 /* libMBProgressHUD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMBProgressHUD.a; path = "../../../../../Library/Developer/Xcode/DerivedData/XQ_DAO-clhjykupbiupwcbxthahdokuzsiy/Build/Products/Debug-iphoneos/MBProgressHUD/libMBProgressHUD.a"; sourceTree = "<group>"; };
+		9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+XQ_DAO.h"; sourceTree = "<group>"; };
+		9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+XQ_DAO.m"; sourceTree = "<group>"; };
+		9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+XQProtect.h"; sourceTree = "<group>"; };
+		9875FD651F3B50C100136FEC /* XQModelBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQModelBlocks.h; sourceTree = "<group>"; };
+		9875FD661F3B50C100136FEC /* XQEntityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQEntityUtils.h; sourceTree = "<group>"; };
+		9875FD681F3B50C100136FEC /* XQMigrationItemBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQMigrationItemBase.h; sourceTree = "<group>"; };
+		9875FD691F3B50C100136FEC /* XQMigrationItemBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQMigrationItemBase.m; sourceTree = "<group>"; };
+		9875FD6A1F3B50C100136FEC /* XQMigrationService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQMigrationService.h; sourceTree = "<group>"; };
+		9875FD6B1F3B50C100136FEC /* XQMigrationService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQMigrationService.m; sourceTree = "<group>"; };
+		9875FD6C1F3B50C100136FEC /* XQMigrationItemBase+Protect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XQMigrationItemBase+Protect.h"; sourceTree = "<group>"; };
+		9875FD6F1F3B50C100136FEC /* XQDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQDatabaseQueue.h; sourceTree = "<group>"; };
+		9875FD701F3B50C100136FEC /* XQDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQDatabaseQueue.m; sourceTree = "<group>"; };
+		9875FD711F3B50C100136FEC /* XQFMDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQFMDBManager.h; sourceTree = "<group>"; };
+		9875FD721F3B50C100136FEC /* XQFMDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQFMDBManager.m; sourceTree = "<group>"; };
+		9875FD731F3B50C100136FEC /* XQSQLCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQSQLCondition.h; sourceTree = "<group>"; };
+		9875FD741F3B50C100136FEC /* XQSQLCondition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQSQLCondition.m; sourceTree = "<group>"; };
+		9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+XQUtils.h"; sourceTree = "<group>"; };
+		9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+XQUtils.m"; sourceTree = "<group>"; };
+		9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQDefaultsStoreBase.h; sourceTree = "<group>"; };
+		9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQDefaultsStoreBase.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9815CF371F39B22500FD7F6C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0EEF768A5F65CA1BED8DBDE2 /* libPods-XQ_DAO.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9815CF411F39B22600FD7F6C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9815CF451F39B22600FD7F6C /* XQ_DAO.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6FDB7AC7C2E0528F3252F938 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				48490A1210FB82D4F5138F9D /* Pods-XQ_DAO.debug.xcconfig */,
+				95098156C257E8D4D94D19F6 /* Pods-XQ_DAO.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		87220819F7D67815B8F884C6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9833D3BA1F3B4B900012A8B7 /* libMBProgressHUD.a */,
+				056FC273F0A4A7AF8F8639B0 /* libPods-XQ_DAO.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9815CF311F39B22500FD7F6C = {
+			isa = PBXGroup;
+			children = (
+				9875FD601F3B50C100136FEC /* src */,
+				9815CF3D1F39B22500FD7F6C /* XQ_DAO */,
+				9815CF481F39B22600FD7F6C /* XQ_DAOTests */,
+				9815CF3C1F39B22500FD7F6C /* Products */,
+				6FDB7AC7C2E0528F3252F938 /* Pods */,
+				87220819F7D67815B8F884C6 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		9815CF3C1F39B22500FD7F6C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9815CF3B1F39B22500FD7F6C /* XQ_DAO.framework */,
+				9815CF441F39B22600FD7F6C /* XQ_DAOTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9815CF3D1F39B22500FD7F6C /* XQ_DAO */ = {
+			isa = PBXGroup;
+			children = (
+				9815CF3E1F39B22500FD7F6C /* XQ_DAO.h */,
+				9815CF3F1F39B22500FD7F6C /* Info.plist */,
+			);
+			path = XQ_DAO;
+			sourceTree = "<group>";
+		};
+		9815CF481F39B22600FD7F6C /* XQ_DAOTests */ = {
+			isa = PBXGroup;
+			children = (
+				9815CF491F39B22600FD7F6C /* XQ_DAOTests.m */,
+				9815CF4B1F39B22600FD7F6C /* Info.plist */,
+			);
+			path = XQ_DAOTests;
+			sourceTree = "<group>";
+		};
+		9875FD601F3B50C100136FEC /* src */ = {
+			isa = PBXGroup;
+			children = (
+				9875FD611F3B50C100136FEC /* CoreEntity */,
+				9875FD651F3B50C100136FEC /* XQModelBlocks.h */,
+				9875FD661F3B50C100136FEC /* XQEntityUtils.h */,
+				9875FD671F3B50C100136FEC /* Migration */,
+				9875FD6D1F3B50C100136FEC /* ModelUtils */,
+				9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */,
+				9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */,
+				9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */,
+				9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		9875FD611F3B50C100136FEC /* CoreEntity */ = {
+			isa = PBXGroup;
+			children = (
+				9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */,
+				9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */,
+				9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */,
+			);
+			path = CoreEntity;
+			sourceTree = "<group>";
+		};
+		9875FD671F3B50C100136FEC /* Migration */ = {
+			isa = PBXGroup;
+			children = (
+				9875FD681F3B50C100136FEC /* XQMigrationItemBase.h */,
+				9875FD691F3B50C100136FEC /* XQMigrationItemBase.m */,
+				9875FD6A1F3B50C100136FEC /* XQMigrationService.h */,
+				9875FD6B1F3B50C100136FEC /* XQMigrationService.m */,
+				9875FD6C1F3B50C100136FEC /* XQMigrationItemBase+Protect.h */,
+			);
+			path = Migration;
+			sourceTree = "<group>";
+		};
+		9875FD6D1F3B50C100136FEC /* ModelUtils */ = {
+			isa = PBXGroup;
+			children = (
+				9875FD6E1F3B50C100136FEC /* FMDB_Extension */,
+				9875FD711F3B50C100136FEC /* XQFMDBManager.h */,
+				9875FD721F3B50C100136FEC /* XQFMDBManager.m */,
+				9875FD731F3B50C100136FEC /* XQSQLCondition.h */,
+				9875FD741F3B50C100136FEC /* XQSQLCondition.m */,
+			);
+			path = ModelUtils;
+			sourceTree = "<group>";
+		};
+		9875FD6E1F3B50C100136FEC /* FMDB_Extension */ = {
+			isa = PBXGroup;
+			children = (
+				9875FD6F1F3B50C100136FEC /* XQDatabaseQueue.h */,
+				9875FD701F3B50C100136FEC /* XQDatabaseQueue.m */,
+			);
+			path = FMDB_Extension;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		9815CF381F39B22500FD7F6C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9875FD891F3B50C100136FEC /* NSArray+XQUtils.h in Headers */,
+				9875FD851F3B50C100136FEC /* XQFMDBManager.h in Headers */,
+				9875FD7B1F3B50C100136FEC /* NSObject+XQProtect.h in Headers */,
+				9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */,
+				9875FD821F3B50C100136FEC /* XQMigrationItemBase+Protect.h in Headers */,
+				9875FD791F3B50C100136FEC /* NSObject+XQ_DAO.h in Headers */,
+				9875FD7D1F3B50C100136FEC /* XQEntityUtils.h in Headers */,
+				9875FD871F3B50C100136FEC /* XQSQLCondition.h in Headers */,
+				9875FD831F3B50C100136FEC /* XQDatabaseQueue.h in Headers */,
+				9815CF4C1F39B22600FD7F6C /* XQ_DAO.h in Headers */,
+				9875FD7C1F3B50C100136FEC /* XQModelBlocks.h in Headers */,
+				9875FD7E1F3B50C100136FEC /* XQMigrationItemBase.h in Headers */,
+				9875FD801F3B50C100136FEC /* XQMigrationService.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		9815CF3A1F39B22500FD7F6C /* XQ_DAO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9815CF4F1F39B22600FD7F6C /* Build configuration list for PBXNativeTarget "XQ_DAO" */;
+			buildPhases = (
+				90F17F5B61D80F221427D2D7 /* [CP] Check Pods Manifest.lock */,
+				9815CF361F39B22500FD7F6C /* Sources */,
+				9815CF371F39B22500FD7F6C /* Frameworks */,
+				9815CF381F39B22500FD7F6C /* Headers */,
+				9815CF391F39B22500FD7F6C /* Resources */,
+				F8DD9B22A674396215822DC1 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XQ_DAO;
+			productName = XQ_DAO;
+			productReference = 9815CF3B1F39B22500FD7F6C /* XQ_DAO.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		9815CF431F39B22600FD7F6C /* XQ_DAOTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9815CF521F39B22600FD7F6C /* Build configuration list for PBXNativeTarget "XQ_DAOTests" */;
+			buildPhases = (
+				9815CF401F39B22600FD7F6C /* Sources */,
+				9815CF411F39B22600FD7F6C /* Frameworks */,
+				9815CF421F39B22600FD7F6C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9815CF471F39B22600FD7F6C /* PBXTargetDependency */,
+			);
+			name = XQ_DAOTests;
+			productName = XQ_DAOTests;
+			productReference = 9815CF441F39B22600FD7F6C /* XQ_DAOTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9815CF321F39B22500FD7F6C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = com.hssdx;
+				TargetAttributes = {
+					9815CF3A1F39B22500FD7F6C = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
+					9815CF431F39B22600FD7F6C = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9815CF351F39B22500FD7F6C /* Build configuration list for PBXProject "XQ_DAO" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 9815CF311F39B22500FD7F6C;
+			productRefGroup = 9815CF3C1F39B22500FD7F6C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9815CF3A1F39B22500FD7F6C /* XQ_DAO */,
+				9815CF431F39B22600FD7F6C /* XQ_DAOTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9815CF391F39B22500FD7F6C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9815CF421F39B22600FD7F6C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		90F17F5B61D80F221427D2D7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-XQ_DAO-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F8DD9B22A674396215822DC1 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-XQ_DAO/Pods-XQ_DAO-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9815CF361F39B22500FD7F6C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9875FD8A1F3B50C100136FEC /* NSArray+XQUtils.m in Sources */,
+				9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */,
+				9875FD861F3B50C100136FEC /* XQFMDBManager.m in Sources */,
+				9875FD7F1F3B50C100136FEC /* XQMigrationItemBase.m in Sources */,
+				9875FD811F3B50C100136FEC /* XQMigrationService.m in Sources */,
+				9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */,
+				9875FD7A1F3B50C100136FEC /* NSObject+XQ_DAO.m in Sources */,
+				9875FD841F3B50C100136FEC /* XQDatabaseQueue.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9815CF401F39B22600FD7F6C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9815CF4A1F39B22600FD7F6C /* XQ_DAOTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9815CF471F39B22600FD7F6C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9815CF3A1F39B22500FD7F6C /* XQ_DAO */;
+			targetProxy = 9815CF461F39B22600FD7F6C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		9815CF4D1F39B22600FD7F6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		9815CF4E1F39B22600FD7F6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		9815CF501F39B22600FD7F6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 48490A1210FB82D4F5138F9D /* Pods-XQ_DAO.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = XQ_DAO/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hssdx.XQ-DAO";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		9815CF511F39B22600FD7F6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 95098156C257E8D4D94D19F6 /* Pods-XQ_DAO.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = XQ_DAO/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hssdx.XQ-DAO";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		9815CF531F39B22600FD7F6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = XQ_DAOTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hssdx.XQ-DAOTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		9815CF541F39B22600FD7F6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = XQ_DAOTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hssdx.XQ-DAOTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9815CF351F39B22500FD7F6C /* Build configuration list for PBXProject "XQ_DAO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9815CF4D1F39B22600FD7F6C /* Debug */,
+				9815CF4E1F39B22600FD7F6C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9815CF4F1F39B22600FD7F6C /* Build configuration list for PBXNativeTarget "XQ_DAO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9815CF501F39B22600FD7F6C /* Debug */,
+				9815CF511F39B22600FD7F6C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9815CF521F39B22600FD7F6C /* Build configuration list for PBXNativeTarget "XQ_DAOTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9815CF531F39B22600FD7F6C /* Debug */,
+				9815CF541F39B22600FD7F6C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9815CF321F39B22500FD7F6C /* Project object */;
+}
