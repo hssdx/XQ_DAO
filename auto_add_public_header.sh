@@ -6,7 +6,7 @@
 project_name="XQ_DAO"
 public_header_file_pod="./tmp_public_header.txt"
 public_header_file_no_pod="./tmp_public_header_no_pod.txt"
-result_file="./${project_name}.h"
+result_file="${project_name}/${project_name}.h"
 
 # echo $result_file
 
@@ -24,7 +24,7 @@ function filtHeaderFile()
 	fi
 	if [ "${filename##*.}" = "h" ]; then
 		echo "#import <XQKit/$filename>" >> $public_header_file_pod
-		echo "#import \"XQKit/$filename\"" >> $public_header_file_no_pod
+		echo "#import \"$filename\"" >> $public_header_file_no_pod
 	fi
 }
 

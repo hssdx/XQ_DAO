@@ -42,16 +42,16 @@ FOUNDATION_EXPORT const unsigned char XQ_DAOVersionString[];
 #else
 
 
-#import "XQKit/XQMigrationItemBase+Protect.h"
-#import "XQKit/XQMigrationItemBase.h"
-#import "XQKit/XQMigrationService.h"
-#import "XQKit/XQDatabaseQueue.h"
-#import "XQKit/XQFMDBManager.h"
-#import "XQKit/XQSQLCondition.h"
-#import "XQKit/NSArray+XQUtils.h"
-#import "XQKit/XQDefaultsStoreBase.h"
-#import "XQKit/XQEntityUtils.h"
-#import "XQKit/XQModelBlocks.h"
+#import "XQMigrationItemBase+Protect.h"
+#import "XQMigrationItemBase.h"
+#import "XQMigrationService.h"
+#import "XQDatabaseQueue.h"
+#import "XQFMDBManager.h"
+#import "XQSQLCondition.h"
+#import "NSArray+XQUtils.h"
+#import "XQDefaultsStoreBase.h"
+#import "XQEntityUtils.h"
+#import "XQModelBlocks.h"
 
 
 #endif
