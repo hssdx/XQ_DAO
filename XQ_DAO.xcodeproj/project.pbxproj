@@ -13,7 +13,6 @@
 		9815CF4C1F39B22600FD7F6C /* XQ_DAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 9815CF3E1F39B22500FD7F6C /* XQ_DAO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9875FD791F3B50C100136FEC /* NSObject+XQ_DAO.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */; };
 		9875FD7A1F3B50C100136FEC /* NSObject+XQ_DAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */; };
-		9875FD7B1F3B50C100136FEC /* NSObject+XQProtect.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */; };
 		9875FD7C1F3B50C100136FEC /* XQModelBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD651F3B50C100136FEC /* XQModelBlocks.h */; };
 		9875FD7D1F3B50C100136FEC /* XQEntityUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD661F3B50C100136FEC /* XQEntityUtils.h */; };
 		9875FD7E1F3B50C100136FEC /* XQMigrationItemBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD681F3B50C100136FEC /* XQMigrationItemBase.h */; };
@@ -56,7 +55,6 @@
 		9833D3BA1F3B4B900012A8B7 /* libMBProgressHUD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMBProgressHUD.a; path = "../../../../../Library/Developer/Xcode/DerivedData/XQ_DAO-clhjykupbiupwcbxthahdokuzsiy/Build/Products/Debug-iphoneos/MBProgressHUD/libMBProgressHUD.a"; sourceTree = "<group>"; };
 		9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+XQ_DAO.h"; sourceTree = "<group>"; };
 		9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+XQ_DAO.m"; sourceTree = "<group>"; };
-		9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+XQProtect.h"; sourceTree = "<group>"; };
 		9875FD651F3B50C100136FEC /* XQModelBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQModelBlocks.h; sourceTree = "<group>"; };
 		9875FD661F3B50C100136FEC /* XQEntityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQEntityUtils.h; sourceTree = "<group>"; };
 		9875FD681F3B50C100136FEC /* XQMigrationItemBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQMigrationItemBase.h; sourceTree = "<group>"; };
@@ -174,7 +172,6 @@
 			children = (
 				9875FD621F3B50C100136FEC /* NSObject+XQ_DAO.h */,
 				9875FD631F3B50C100136FEC /* NSObject+XQ_DAO.m */,
-				9875FD641F3B50C100136FEC /* NSObject+XQProtect.h */,
 			);
 			path = CoreEntity;
 			sourceTree = "<group>";
@@ -221,7 +218,6 @@
 			files = (
 				9875FD891F3B50C100136FEC /* NSArray+XQUtils.h in Headers */,
 				9875FD851F3B50C100136FEC /* XQFMDBManager.h in Headers */,
-				9875FD7B1F3B50C100136FEC /* NSObject+XQProtect.h in Headers */,
 				9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */,
 				9875FD821F3B50C100136FEC /* XQMigrationItemBase+Protect.h in Headers */,
 				9875FD791F3B50C100136FEC /* NSObject+XQ_DAO.h in Headers */,

@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, OrderType) {
 @property (readonly, strong, nonatomic) NSMutableArray<NSString *> *orderSQLs;
 
 + (instancetype)SQLConditionWithCondition:(XQSQLCondition *)condition;
++ (instancetype)condition;
 + (instancetype)conditionWhere:(NSString *)field equal:(id)value;
 + (instancetype)conditionWhere:(NSString *)field notEqual:(id)value;
 + (instancetype)conditionWhere:(NSString *)field greater:(id)value;

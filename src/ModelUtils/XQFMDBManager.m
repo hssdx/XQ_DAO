@@ -9,6 +9,7 @@
 #import "XQFMDBManager.h"
 #import "XQDatabaseQueue.h"
 #import "XQMigrationService.h"
+#import "NSObject+XQ_DAO.h"
 
 #import <FMDB/FMDB.h>
 #import <YYKit/YYKit.h>
@@ -166,7 +167,7 @@
         }
         [classes enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             Class cls = NSClassFromString(obj);
-            SEL createSQLSel = NSSelectorFromString(@"createSQL");
+            SEL createSQLSel = @selector(xq_createSQL);
             NSString *statement =((NSString * (*)(id, SEL))(void *)objc_msgSend)(cls, createSQLSel);
             res = [db executeStatements:statement];
             if (res == NO) {

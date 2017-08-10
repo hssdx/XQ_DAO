@@ -16,6 +16,22 @@
 #import <XQKit/XQKit.h>
 #import <YYKit/YYKit.h>
 
+
+#define CALL_CHILD_IF_EXIST(_SEL) \
+if ([self respondsToSelector:@selector(child_##_SEL)]) { \
+    return [(id<XQDBModel>)self child_##_SEL]; \
+}
+
+#define CALL_CHILD_IF_EXIST_PRAMA1(_SEL, _PRAMA1) \
+if ([self respondsToSelector:@selector(child_##_SEL:)]) { \
+    return [(id<XQDBModel>)self child_##_SEL:_PRAMA1]; \
+}
+
+#define CALL_CHILD_IF_EXIST_PRAMA1_PRAMA2(_SEL1, _SEL2, _PRAMA1, _PRAMA2) \
+if ([self respondsToSelector:@selector(child_##_SEL1:_SEL2:)]) { \
+    return [(id<XQDBModel>)self child_##_SEL1:_PRAMA1 _SEL2:_PRAMA2]; \
+}
+
 /**
  *  model表信息，包括字段名集合，字段类型集合，表名
  *  @{@"fieldNames": NSArray, @"fieldTypes":NSArray, @"tableName":NSString}
@@ -28,47 +44,86 @@ NSString *const kFieldNames = @"fieldNames";
 NSString *const kFieldTypes = @"fieldTypes";
 NSString *const kTableName = @"tableName";
 
-
 @implementation NSObject (XQ_DAO)
 
-//- (void)setLocalID:(NSNumber *)localID {
-//    if (localID == _localID) {
-//        return;
-//    }
-//    _localID = [self.class safeNumberValue:localID];
-//    XQAssert(!!localID == !!_localID);
-//}
-
-+ (NSString*)rawUUID {
-    NSString *uuid = nil;
-    CFUUIDRef puuid = CFUUIDCreate(nil);
-    CFStringRef uuidString = CFUUIDCreateString(nil, puuid);
-    uuid = (NSString *)CFBridgingRelease(CFStringCreateCopy(NULL, uuidString));
-    XQCFRelease(puuid);
-    XQCFRelease(uuidString);
-    return uuid;
++ (void)load {
+    [self swizzleInstanceMethod:NSSelectorFromString(@"setLocalID:")
+                           with:@selector(swizzle_setLocalID:)];
 }
 
-+ (NSArray *)idsGroupByIds:(NSArray *)ids limitCount:(NSInteger)limitCount {
-    NSMutableArray<NSArray *> *idsGroup = [NSMutableArray array];
-    for (NSUInteger idx = 0; idx < ids.count; idx += limitCount) {
-        NSUInteger length = limitCount;
-        if (idx + limitCount > ids.count) {
-            length = ids.count - idx;
-        }
-        [idsGroup addObject:[ids subarrayWithRange:NSMakeRange(idx, length)]];
-    }
-    return idsGroup;
+- (void)swizzle_setLocalID:(NSNumber *)localID {
+    localID = [self.class xq_safeNumberValue:localID];
+    [self swizzle_setLocalID:localID];
 }
 
 #pragma mark - override func
-+ (NSDictionary *)fieldDescribeDict {
+
++ (NSArray<NSString *> *)xq_uniquesAbleNull {
+    CALL_CHILD_IF_EXIST(uniquesAbleNull)
+    return [self xq_uniquesNotNull];
+}
+
++ (NSArray<NSString *> *)xq_uniquesNotNull {
+    CALL_CHILD_IF_EXIST(uniquesNotNull)
+    return @[PROP_TO_STRING(localID),
+             PROP_TO_STRING(UUID)];
+}
+
++ (NSArray<NSString *> *)xq_notNullFields {
+    CALL_CHILD_IF_EXIST(notNullFields)
+    return [self xq_uniquesNotNull];
+}
+
++ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderSQLsArray {
+    CALL_CHILD_IF_EXIST(orderSQLsArray)
+    return @[@{PROP_TO_STRING(localID):@(OrderTypeDESC)}];
+}
+
++ (NSString *)xq_primaryKey {
+    CALL_CHILD_IF_EXIST(primaryKey)
+    return PROP_TO_STRING(localID);
+}
+
++ (BOOL)xq_isPrimaryKey:(NSString *)field {
+    CALL_CHILD_IF_EXIST_PRAMA1(isPrimaryKey, field)
+    if (!field) {
+        return NO;
+    }
+    if ([field isEqualToString:[self xq_primaryKey]]) {
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)xq_isUnchangeableField:(NSString *)field {
+    CALL_CHILD_IF_EXIST_PRAMA1(isUnchangeableField, field)
+    if (!field) {
+        return NO;
+    }
+    if ([[self xq_uniquesAbleNull] containsObject:field]) {
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)xq_isUnableNullField:(NSString *)field {
+    CALL_CHILD_IF_EXIST_PRAMA1(isUnableNullField, field)
+    if (!field) {
+        return NO;
+    }
+    if ([[self xq_notNullFields] containsObject:field]) {
+        return YES;
+    }
+    return NO;
+}
+
++ (NSDictionary *)xq_fieldDescribeDict {
     NSMutableSet *fieldsSet = [NSMutableSet set];
     NSMutableDictionary *fieldDescribes = [NSMutableDictionary dictionary];
     fieldDescribes[PROP_TO_STRING(deleted)] = @"DEFAULT 0";
-    fieldDescribes[self.primaryKey] = @"PRIMARY KEY AUTOINCREMENT NOT NULL";
-    [fieldsSet addObject:self.primaryKey];
-    NSArray<NSString *> *fields  = [self uniquesNotNull];
+    fieldDescribes[self.xq_primaryKey] = @"PRIMARY KEY AUTOINCREMENT NOT NULL";
+    [fieldsSet addObject:self.xq_primaryKey];
+    NSArray<NSString *> *fields  = [self xq_uniquesNotNull];
     for (NSString *field in fields) {
         if ([fieldsSet containsObject:field]) {
             continue;
@@ -77,7 +132,7 @@ NSString *const kTableName = @"tableName";
         fieldDescribes[field] = @"NOT NULL UNIQUE";
     }
     NSMutableSet<NSString *> *notNullfields = [NSMutableSet set];
-    [notNullfields addObjectsFromArray:[self notNullFields]];
+    [notNullfields addObjectsFromArray:[self xq_notNullFields]];
     for (NSString *field in notNullfields) {
         if ([fieldsSet containsObject:field]) {
             continue;
@@ -88,8 +143,9 @@ NSString *const kTableName = @"tableName";
     return fieldDescribes;
 }
 
-+ (NSString *)fieldDescribe:(NSString *)fieldName {
-    NSDictionary *mapping = [self fieldDescribeDict];
++ (NSString *)xq_fieldDescribe:(NSString *)fieldName {
+    CALL_CHILD_IF_EXIST_PRAMA1(fieldDescribe, fieldName)
+    NSDictionary *mapping = [self xq_fieldDescribeDict];
     NSString *result = mapping[fieldName];
     if ([result length] > 0) {
         return result;
@@ -98,38 +154,19 @@ NSString *const kTableName = @"tableName";
     }
 }
 
-+ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)orderSQLsArray {
-    return @[@{PROP_TO_STRING(localID):@(OrderTypeDESC)}];
-}
-
-+ (NSDictionary<NSString *, NSNumber *> *)startValueForAutoIncrement {
++ (NSDictionary<NSString *, NSNumber *> *)xq_startValueForAutoIncrement {
+    CALL_CHILD_IF_EXIST(startValueForAutoIncrement)
     return @{PROP_TO_STRING(localID):@100};
 }
 
-+ (NSString *)primaryKey {
-    return PROP_TO_STRING(localID);
+- (XQSQLCondition *)xq_defaultExistCondition {
+    CALL_CHILD_IF_EXIST(defaultExistCondition)
+    return [self xq_defaultExistConditionWithDbModel:nil];
 }
 
-+ (NSArray<NSString *> *)uniquesAbleNull {
-    return [self uniquesNotNull];
-}
-
-+ (NSArray<NSString *> *)uniquesNotNull {
-    return @[PROP_TO_STRING(localID),
-             PROP_TO_STRING(UUID)];
-}
-
-+ (NSArray<NSString *> *)notNullFields {
-    return [self uniquesNotNull];
-}
-
-- (XQSQLCondition *)defaultExistCondition {
-    return [self defaultExistConditionWithDbModel:nil];
-}
-
-- (XQSQLCondition *)defaultExistConditionWithDbModel:(__kindof NSObject *)dbModel {
+- (XQSQLCondition *)xq_defaultExistConditionWithDbModel:(__kindof NSObject *)dbModel {
     XQSQLCondition *condition = [XQSQLCondition new];
-    NSArray<NSString *> *fields  = [self.class uniquesAbleNull];
+    NSArray<NSString *> *fields = [self.class xq_uniquesAbleNull];
     for (NSString *field in fields) {
         if ([self respondsToSelector:NSSelectorFromString(field)]) {
             id value = [self valueForKey:field];
@@ -152,10 +189,10 @@ NSString *const kTableName = @"tableName";
  * 要插入数据前的检查
  * 返回 YES 则允许插入，否则返回 NO
  */
-- (BOOL)willInsert {
-    NSArray *fields = [self.class notNullFields];
+- (BOOL)xq_willInsert {
+    NSArray *fields = [self.class xq_notNullFields];
     for (NSString *field in fields) {
-        if ([field isEqualToString:[self.class primaryKey]]) {
+        if ([field isEqualToString:[self.class xq_primaryKey]]) {
             id value = [self valueForKey:field];
             if (value) {
                 [self setValue:nil forKey:field];
@@ -166,7 +203,7 @@ NSString *const kTableName = @"tableName";
             continue;//主键不需要设定
         }
         if (nil == [self valueForKey:field]) {
-            XQLogWarn(@"[%@](%@)field error so can't insert this object", [self.class tableName], field);
+            XQLogWarn(@"[%@](%@)field error so can't insert this object", [self.class xq_tableName], field);
             return NO;
         }
     }
@@ -177,7 +214,9 @@ NSString *const kTableName = @"tableName";
  * 如果是需要更新的字段，或数据库中不存在，则需要更新
  * 返回 YES 则更新当前值，否则返回 NO
  */
-- (BOOL)willUpdatedbModel:(NSObject *)dbModel withFieldName:(NSString *)fieldName {
+- (BOOL)xq_willUpdatedbModel:(NSObject *)dbModel withFieldName:(NSString *)fieldName {
+    CALL_CHILD_IF_EXIST_PRAMA1_PRAMA2(willUpdatedbModel, withFieldName, dbModel, fieldName)
+
     id value = [self valueForKey:fieldName];
     if (!value) {
         return NO;
@@ -186,7 +225,7 @@ NSString *const kTableName = @"tableName";
     if (!dbValue) {
         return YES;
     }
-    if ([self.class isUnchangeableField:fieldName]) {
+    if ([self.class xq_isUnchangeableField:fieldName]) {
         return NO;
     }
     if (![value isKindOfClass:[dbValue class]]) {
@@ -217,51 +256,21 @@ NSString *const kTableName = @"tableName";
     return YES;
 }
 
-+ (BOOL)isPrimaryKey:(NSString *)field {
-    if (!field) {
-        return NO;
-    }
-    if ([field isEqualToString:[self primaryKey]]) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (BOOL)isUnchangeableField:(NSString *)field {
-    if (!field) {
-        return NO;
-    }
-    if ([[self uniquesAbleNull] containsObject:field]) {
-        return YES;
-    }
-    return NO;
-}
-
-+ (BOOL)isUnableNullField:(NSString *)field {
-    if (!field) {
-        return NO;
-    }
-    if ([[self notNullFields] containsObject:field]) {
-        return YES;
-    }
-    return NO;
-}
-
 #pragma mark - public func
-+ (NSObject *)existObject:(NSObject *)modelObj {
++ (NSObject *)xq_existObject:(NSObject *)modelObj {
     if (!modelObj) {
         return nil;
     }
-    XQSQLCondition *condition = [modelObj defaultExistCondition];
+    XQSQLCondition *condition = [modelObj xq_defaultExistCondition];
     if ([condition.condition count] == 0) {
         return nil;
     }
-    NSObject *result = [self queryModelsWithCondition:condition].firstObject;
+    NSObject *result = [self xq_queryModelsWithCondition:condition].firstObject;
     return result;
 }
 
-+ (void)copyFromObject:(NSObject *)fromObject toObject:(NSObject *)toObject {
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
++ (void)xq_copyFromObject:(NSObject *)fromObject toObject:(NSObject *)toObject {
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     [fieldNames enumerateObjectsUsingBlock:^(NSString * _Nonnull fieldName, NSUInteger idx, BOOL * _Nonnull stop) {
         id value = [fromObject valueForKey:fieldName];
@@ -271,14 +280,14 @@ NSString *const kTableName = @"tableName";
     }];
 }
 
-+ (void)saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects updateIfExist:(BOOL)updateIfExist {
++ (void)xq_saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects updateIfExist:(BOOL)updateIfExist {
     if (objects.count == 0) {
         return;
     }
     NSMutableArray<NSObject *> *deleteModels = [NSMutableArray array];
     NSMutableArray<NSObject *> *saveModels = [NSMutableArray array];
     NSMutableDictionary *rejectDuplicateFieldDict = [NSMutableDictionary new]; //判重 field -> valuesSet
-    NSArray *fields = [self uniquesAbleNull];
+    NSArray *fields = [self xq_uniquesAbleNull];
     [objects enumerateObjectsUsingBlock:^(__kindof NSObject * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         for (NSString *field in fields) {
             id value = [obj valueForKey:field];
@@ -304,7 +313,7 @@ NSString *const kTableName = @"tableName";
             [saveModels addObject:obj];
         }
     }];
-    [self deleteObjectsInTransaction:deleteModels];
+    [self xq_deleteObjectsInTransaction:deleteModels];
     [self _saveObjectsInTransaction:saveModels updateIfExist:updateIfExist];
     if (deleteModels.count > 0) {
         [self xqNotifyAction:@"DeleteModels" withObject:deleteModels];
@@ -316,8 +325,8 @@ NSString *const kTableName = @"tableName";
     }
 }
 
-+ (void)saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects {
-    [self saveObjectsInTransaction:objects updateIfExist:YES];
++ (void)xq_saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects {
+    [self xq_saveObjectsInTransaction:objects updateIfExist:YES];
 }
 
 + (void)_saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects updateIfExist:(BOOL)updateIfExist {
@@ -325,8 +334,8 @@ NSString *const kTableName = @"tableName";
         return;
     }
     NSArray<XQDBBlock> *blocks = [objects xq_compact:^id _Nonnull(__kindof NSObject * _Nonnull object) {
-        XQDBBlock block = [self dbBlockForAddObject:^(id model) {
-            [self copyFromObject:object toObject:model];
+        XQDBBlock block = [self xq_dbBlockForAddObject:^(id model) {
+            [self xq_copyFromObject:object toObject:model];
         } updateIfExist:updateIfExist];
         return block;
     }];
@@ -343,7 +352,7 @@ NSString *const kTableName = @"tableName";
 //               afterDelay:delay];
 //}
 
-+ (void)saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
++ (void)xq_saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
     
     __block NSObject *blockModel;
     InitModelBlock initBlock = ^(id model){
@@ -369,47 +378,47 @@ NSString *const kTableName = @"tableName";
     }
 }
 
-- (void)save {
-    [self.class saveObject:self];
+- (void)xq_save {
+    [self.class xq_saveObject:self];
 }
 
-+ (void)saveObject:(__kindof NSObject *)object {
-    [self saveObject:object updateIfExist:YES];
++ (void)xq_saveObject:(__kindof NSObject *)object {
+    [self xq_saveObject:object updateIfExist:YES];
 }
 
-+ (void)saveObject:(__kindof NSObject *)object updateIfExist:(BOOL)updateIfExist {
-    [self saveObjectWithBlock:^(id model) {
-        [self copyFromObject:object toObject:model];
++ (void)xq_saveObject:(__kindof NSObject *)object updateIfExist:(BOOL)updateIfExist {
+    [self xq_saveObjectWithBlock:^(id model) {
+        [self xq_copyFromObject:object toObject:model];
     } updateIfExist:updateIfExist];
 }
 
-+ (void)saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist {
++ (void)xq_saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist {
     DBOptType optType = DBOptTypeNone;
-    [self saveObjectWithBlock:initModelBlock updateIfExist:updateIfExist optType:&optType];
+    [self xq_saveObjectWithBlock:initModelBlock updateIfExist:updateIfExist optType:&optType];
 }
 
 + (void)_saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
-    XQDBBlock block = [self dbBlockForAddObject:initModelBlock updateIfExist:updateIfExist optType:optType];
+    XQDBBlock block = [self xq_dbBlockForAddObject:initModelBlock updateIfExist:updateIfExist optType:optType];
     if (block) {
         [[XQFMDBManager defaultManager] executeBlock:block];
     }
 }
 
-- (BOOL)deleteFromDatabase {
-    BOOL res = [self.class deleteObject:self];
+- (BOOL)xq_deleteFromDatabase {
+    BOOL res = [self.class xq_deleteObject:self];
 //    [[NSNotificationCenter defaultCenter] notifyModelDelete:self];
     return res;
 }
 
-+ (BOOL)deleteObject:(__kindof NSObject *)object {
-    XQDBBlock block = [self dbBlockForDeleteObject:object];
++ (BOOL)xq_deleteObject:(__kindof NSObject *)object {
+    XQDBBlock block = [self xq_dbBlockForDeleteObject:object];
     [[XQFMDBManager defaultManager] executeBlock:block];
     return !!block;
 }
 
-+ (BOOL)deleteObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects {
++ (BOOL)xq_deleteObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects {
     NSArray<XQDBBlock> *blocks = [objects xq_compact:^id _Nonnull(__kindof NSObject * _Nonnull object) {
-        return [self dbBlockForDeleteObject:object];
+        return [self xq_dbBlockForDeleteObject:object];
     }];
     [[XQFMDBManager defaultManager] executeBlocksInTransaction:blocks];
     if (blocks.count == 0 && objects > 0) {
@@ -418,32 +427,32 @@ NSString *const kTableName = @"tableName";
     return YES;
 }
 
-+ (BOOL)deleteObjectWithCondition:(XQSQLCondition *)condition {
-    XQDBBlock block = [self dbBlockForDeleteObjectWithCondition:condition];
++ (BOOL)xq_deleteObjectWithCondition:(XQSQLCondition *)condition {
+    XQDBBlock block = [self xq_dbBlockForDeleteObjectWithCondition:condition];
     [[XQFMDBManager defaultManager] executeBlock:block];
     return !!block;
 }
 
-+ (BOOL)deleteWhere:(NSString *)field equal:(id)value {
++ (BOOL)xq_deleteWhere:(NSString *)field equal:(id)value {
     XQSQLCondition *condition = [XQSQLCondition conditionWhere:field equal:value];
-    return [self deleteObjectWithCondition:condition];
+    return [self xq_deleteObjectWithCondition:condition];
 }
 
-+ (BOOL)deleteWhereLocalIDEqual:(NSNumber *)localID {
-    return [self deleteWhere:PROP_TO_STRING(localID) equal:localID];
++ (BOOL)xq_deleteWhereLocalIDEqual:(NSNumber *)localID {
+    return [self xq_deleteWhere:PROP_TO_STRING(localID) equal:localID];
 }
 
-+ (BOOL)clean {
++ (BOOL)xq_clean {
     __block BOOL res = NO;
     __block NSError *error;
     
     XQDBBlock block = ^BOOL(FMDatabase *db){
-        WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
+        WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
         NSString *tableName = tableDescribtion[kTableName];
         NSString *sql = [NSString stringWithFormat:@"DROP TABLE IF EXISTS %@", tableName];
         res = [db executeUpdate:sql withErrorAndBindings:&error];
         if (res) {
-            res = [db executeStatements:[self createSQL]];
+            res = [db executeStatements:[self xq_createSQL]];
             XQLog(@"Model '%@' clean success", NSStringFromClass(self));
         }
         return res;
@@ -456,58 +465,58 @@ NSString *const kTableName = @"tableName";
     return res;
 }
 
-+ (NSArray<__kindof NSObject *> *)queryModels {
-    return [self queryModelsAtIndex:0 limitCount:0];
++ (NSArray<__kindof NSObject *> *)xq_queryModels {
+    return [self xq_queryModelsAtIndex:0 limitCount:0];
 }
 
-+ (NSArray<__kindof NSObject *> *)queryModelsWithCondition:(XQSQLCondition *)condition {
-    __block NSMutableArray *queryResult = [NSMutableArray array];
-    [self queryModelsWithBlock:^(NSObject *model) {
-        [queryResult addObject:model];
++ (NSArray<__kindof NSObject *> *)xq_queryModelsWithCondition:(XQSQLCondition *)condition {
+    NSMutableArray *result = [NSMutableArray array];
+    [self xq_queryModelsWithBlock:^(NSObject *model) {
+        [result addObject:model];
     } condition:condition];
-    return queryResult;
+    return result;
 }
 
-+ (void)queryModelsWithBlock:(QueryModelBlock)queryModelBlock
-                     atIndex:(NSUInteger)index
-                  limitCount:(NSUInteger)limitCount {
-    XQSQLCondition *condition = [XQSQLCondition new];
-    [condition setLimitFrom:index limitCount:limitCount];
-    [self queryModelsWithBlock:queryModelBlock
-                     condition:condition];
++ (NSArray<__kindof NSObject *> *)xq_queryModelsAtIndex:(NSUInteger)index limitCount:(NSUInteger)limitCount {
+    return
+    [self xq_queryMakeCondition:^(XQSQLCondition *condition) {
+        [condition setLimitFrom:index limitCount:limitCount];
+    }];
 }
 
-+ (NSArray<__kindof NSObject *> *)queryModelsAtIndex:(NSUInteger)index limitCount:(NSUInteger)limitCount {
-    XQSQLCondition *condition = [XQSQLCondition new];
-    [condition setLimitFrom:index limitCount:limitCount];
-    return [self queryModelsWithCondition:condition];
++ (instancetype)xq_queryWhereUUIDEqual:(NSString *)UUID {
+    return [self xq_queryWhere:PROP_TO_STRING(UUID) equal:UUID];
 }
 
-+ (instancetype)queryWhereUUIDEqual:(NSString *)UUID {
-    return [self queryWhere:PROP_TO_STRING(UUID) equal:UUID];
++ (instancetype)xq_queryWhereLocalIDEqual:(NSNumber *)localID {
+    return [self xq_queryWhere:PROP_TO_STRING(localID) equal:localID];
 }
 
-+ (instancetype)queryWhereLocalIDEqual:(NSNumber *)localID {
-    return [self queryWhere:PROP_TO_STRING(localID) equal:localID];
-}
-
-+ (instancetype)queryWhere:(NSString *)field equal:(id)value {
++ (instancetype)xq_queryWhere:(NSString *)field equal:(id)value {
     if (!value) {
         return nil;
     }
     XQSQLCondition *condition = [XQSQLCondition conditionWhere:field equal:value];
     __kindof NSObject *result =
-    [[self queryModelsWithCondition:condition] firstObject];
+    [[self xq_queryModelsWithCondition:condition] firstObject];
     return result;
 }
 
-+ (NSArray<__kindof NSObject *> *)queryModelsWhere:(NSString *)field equal:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition conditionWhere:field equal:value];
-    return [self queryModelsWithCondition:condition];
++ (NSArray<__kindof NSObject *> *)xq_queryMakeCondition:(void(^)(XQSQLCondition *condition))makeCondition {
+    XQSQLCondition *condition = [XQSQLCondition condition];
+    if (makeCondition) {
+        makeCondition(condition);
+    }
+    return [self xq_queryModelsWithCondition:condition];
 }
 
-+ (void)queryModelsWithBlock:(QueryModelBlock)queryModelBlock condition:(XQSQLCondition *)condition {
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
++ (NSArray<__kindof NSObject *> *)xq_queryModelsWhere:(NSString *)field equal:(id)value {
+    XQSQLCondition *condition = [XQSQLCondition conditionWhere:field equal:value];
+    return [self xq_queryModelsWithCondition:condition];
+}
+
++ (void)xq_queryModelsWithBlock:(QueryModelBlock)queryModelBlock condition:(XQSQLCondition *)condition {
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     NSString *tableName = tableDescribtion[kTableName];
     
@@ -525,11 +534,12 @@ NSString *const kTableName = @"tableName";
         }
         [sql appendFormat:@" from %@ ", tableName];
         if (condition.orderSQLs.count == 0) {
-            [[self orderSQLsArray] enumerateObjectsUsingBlock:
+            [[self xq_orderSQLsArray] enumerateObjectsUsingBlock:
              ^(NSDictionary<NSString *,NSNumber *> * _Nonnull obj,
                NSUInteger idx, BOOL * _Nonnull stop) {
                  XQAssert(obj.count == 1);
-                [condition addOrderField:obj.allKeys.firstObject orderType:obj.allValues.firstObject.integerValue];
+                [condition addOrderField:obj.allKeys.firstObject
+                               orderType:obj.allValues.firstObject.integerValue];
             }];
         }
         
@@ -564,14 +574,14 @@ NSString *const kTableName = @"tableName";
     [[XQFMDBManager defaultManager] executeBlock:block];
 }
 
-+ (void)setProperty:(NSString *)prop value:(id)value {
-    [self setProperty:prop value:value condition:nil];
++ (void)xq_setProperty:(NSString *)prop value:(id)value {
+    [self xq_setProperty:prop value:value condition:nil];
 }
 
 #pragma mark - advanced func
 
-+ (XQDBBlock)dbBlockForInsertObject:(NSObject *)model {
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
++ (XQDBBlock)xq_dbBlockForInsertObject:(NSObject *)model {
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     NSString *tableName = tableDescribtion[kTableName];
     
@@ -581,9 +591,9 @@ NSString *const kTableName = @"tableName";
         id uuid = [model valueForKey:PROP_TO_STRING(UUID)];
         if (!uuid) {
             //强制有 UUID
-            [model setValue:[self rawUUID] forKey:PROP_TO_STRING(UUID)];
+            [model setValue:[self xq_rawUUID] forKey:PROP_TO_STRING(UUID)];
         }
-        if (NO == [model willInsert]) {
+        if (NO == [model xq_willInsert]) {
             return YES;
         }
         NSMutableString *sql = [NSMutableString stringWithString:@"insert into "];
@@ -593,7 +603,7 @@ NSString *const kTableName = @"tableName";
         NSMutableArray *sympleArray = [NSMutableArray array];
         [fieldNames enumerateObjectsUsingBlock:
          ^(NSString *_Nonnull fieldName, NSUInteger idx, BOOL * _Nonnull stop) {
-             if (![self isPrimaryKey:fieldName]) {
+             if (![self xq_isPrimaryKey:fieldName]) {
                  id value = [model valueForKey:fieldName];
                  if (value && ![value isKindOfClass:[NSNull class]]) {
                      [columnArray addObject:fieldName];
@@ -613,8 +623,8 @@ NSString *const kTableName = @"tableName";
 #if !容错
         columnArray = [NSMutableArray array];
         valuesArray = [NSMutableArray array];
-        XQSQLCondition *condition = [model defaultExistCondition];
-        NSString *updateSql = [self updateSqlForModel:model dbModel:nil fieldNames:fieldNames columnArray:columnArray valuesArray:valuesArray condition:condition];
+        XQSQLCondition *condition = [model xq_defaultExistCondition];
+        NSString *updateSql = [self xq_updateSqlForModel:model dbModel:nil fieldNames:fieldNames columnArray:columnArray valuesArray:valuesArray condition:condition];
         if (updateSql) {
             res = [db executeUpdate:updateSql withArgumentsInArray:valuesArray];
             if (!res) {
@@ -630,50 +640,52 @@ NSString *const kTableName = @"tableName";
     } copy];
 }
 
-+ (void)setProperty:(NSString *)prop value:(id)value condition:(XQSQLCondition *)condition {
-    XQDBBlock block = [self dbBlockForUpdateProperty:prop value:value condition:condition];
++ (void)xq_setProperty:(NSString *)prop value:(id)value condition:(XQSQLCondition *)condition {
+    XQDBBlock block = [self xq_dbBlockForUpdateProperty:prop value:value condition:condition];
     [[XQFMDBManager defaultManager] executeBlock:block];
 }
 
-+ (NSUInteger)countOfCol {
-    return [self countOfCondition:nil];
++ (NSUInteger)xq_countOfCol {
+    return [self xq_countOfCondition:nil];
 }
 
-//+ (BOOL)tableExisted {
-//    __block BOOL exist = NO;
-//    [[XQFMDBManager defaultManager] executeBlock:^BOOL(FMDatabase *db) {
-//        NSString *sql =
-//        [NSString stringWithFormat:@"\
-//         SELECT count(*) FROM `sqlite_master` \
-//         WHERE `type` = 'table' AND lower(name) = '%@'",
-//         [self tableName]];
-//        
-//        FMResultSet *rs = [db executeQuery:sql];
-//        while ([rs next]) {
-//            NSNumber *value = [rs objectForColumnIndex:0];
-//            if (value.longLongValue > 0) {
-//                exist = YES;
-//            }
-//            [rs close];
-//        }
-//        return YES;
-//    }];
-//    return exist;
-//}
+#if 0
++ (BOOL)xq_tableExisted {
+    __block BOOL exist = NO;
+    [[XQFMDBManager defaultManager] executeBlock:^BOOL(FMDatabase *db) {
+        NSString *sql =
+        [NSString stringWithFormat:@"\
+         SELECT count(*) FROM `sqlite_master` \
+         WHERE `type` = 'table' AND lower(name) = '%@'",
+         [self xq_tableName]];
+        
+        FMResultSet *rs = [db executeQuery:sql];
+        while ([rs next]) {
+            NSNumber *value = [rs objectForColumnIndex:0];
+            if (value.longLongValue > 0) {
+                exist = YES;
+            }
+            [rs close];
+        }
+        return YES;
+    }];
+    return exist;
+}
+#endif
 
-+ (NSUInteger)countOfWhereProp:(NSString *)prop equal:(id)value {
++ (NSUInteger)xq_countOfWhereProp:(NSString *)prop equal:(id)value {
     XQSQLCondition *condition = [XQSQLCondition new];
     [condition addWhereField:prop compare:SQLCompareEqual value:value logicCode:LogicCodeNone];
-    return [self countOfCondition:condition];
+    return [self xq_countOfCondition:condition];
 }
 
-+ (NSUInteger)countOfWhereProp:(NSString *)prop notEqual:(id)value {
++ (NSUInteger)xq_countOfWhereProp:(NSString *)prop notEqual:(id)value {
     XQSQLCondition *condition = [XQSQLCondition new];
     [condition addWhereField:prop compare:SQLCompareNotEqual value:value logicCode:LogicCodeNone];
-    return [self countOfCondition:condition];
+    return [self xq_countOfCondition:condition];
 }
 
-+ (NSUInteger)countOfCondition:(XQSQLCondition *)condition {
++ (NSUInteger)xq_countOfCondition:(XQSQLCondition *)condition {
     NSString *tableName = NSStringFromClass(self.class);
     __block NSUInteger count = 0;
     XQDBBlock block = ^BOOL(FMDatabase *db){
@@ -699,13 +711,13 @@ NSString *const kTableName = @"tableName";
     return count;
 }
 
-+ (XQDBBlock)dbBlockForUpdateProperty:(NSString *)prop value:(id)value condition:(XQSQLCondition *)condition {
++ (XQDBBlock)xq_dbBlockForUpdateProperty:(NSString *)prop value:(id)value condition:(XQSQLCondition *)condition {
     NSObject *model = [self new];
     [model setValue:value forKey:prop];
-    return [self dbBlockForUpdateObject:model dbModel:nil condition:condition];
+    return [self xq_dbBlockForUpdateObject:model dbModel:nil condition:condition];
 }
 
-+ (NSString *)updateSqlForModel:(NSObject *)model
++ (NSString *)xq_updateSqlForModel:(NSObject *)model
                         dbModel:(NSObject *)dbModel
                      fieldNames:(WCModelDescribtion *)fieldNames
                     columnArray:(NSMutableArray *)columnArray
@@ -714,9 +726,9 @@ NSString *const kTableName = @"tableName";
     NSString *tableName = NSStringFromClass(self.class);
     [fieldNames enumerateObjectsUsingBlock:
      ^(NSString *_Nonnull fieldName, NSUInteger idx, BOOL * _Nonnull stop) {
-         if (![self isPrimaryKey:fieldName]) {
+         if (![self xq_isPrimaryKey:fieldName]) {
              if (dbModel) {
-                 if ([model willUpdatedbModel:dbModel withFieldName:fieldName]) {
+                 if ([model xq_willUpdatedbModel:dbModel withFieldName:fieldName]) {
                      [columnArray addObject:[NSString stringWithFormat:@" %@=? ", fieldName]];
                      [valuesArray addObject:[model valueForKey:fieldName]];
                      [dbModel setValue:[model valueForKey:fieldName] forKey:fieldName];
@@ -744,8 +756,8 @@ NSString *const kTableName = @"tableName";
     return nil;
 }
 
-+ (XQDBBlock)dbBlockForUpdateObject:(NSObject *)model dbModel:(NSObject *)dbModel condition:(XQSQLCondition *)condition {
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
++ (XQDBBlock)xq_dbBlockForUpdateObject:(NSObject *)model dbModel:(NSObject *)dbModel condition:(XQSQLCondition *)condition {
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     
     @weakify(self);
@@ -755,7 +767,7 @@ NSString *const kTableName = @"tableName";
         NSMutableArray *valuesArray = [NSMutableArray array];
         
         NSString *sql =
-        [self updateSqlForModel:model dbModel:dbModel fieldNames:fieldNames columnArray:columnArray valuesArray:valuesArray condition:condition];
+        [self xq_updateSqlForModel:model dbModel:dbModel fieldNames:fieldNames columnArray:columnArray valuesArray:valuesArray condition:condition];
         if (sql) {
             BOOL res = [db executeUpdate:sql withArgumentsInArray:valuesArray];
             if (!res) {
@@ -768,12 +780,12 @@ NSString *const kTableName = @"tableName";
     } copy];
 }
 
-+ (XQDBBlock)dbBlockForAddObject:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist {
++ (XQDBBlock)xq_dbBlockForAddObject:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist {
     DBOptType optType = DBOptTypeNone;
-    return [self dbBlockForAddObject:initModelBlock updateIfExist:updateIfExist optType:&optType];
+    return [self xq_dbBlockForAddObject:initModelBlock updateIfExist:updateIfExist optType:&optType];
 }
 
-+ (XQDBBlock)dbBlockForAddObject:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
++ (XQDBBlock)xq_dbBlockForAddObject:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
     XQDBBlock block;
     NSObject *model = [[self alloc] init];
     if (initModelBlock) {
@@ -782,7 +794,7 @@ NSString *const kTableName = @"tableName";
     if (optType) {
         *optType = DBOptTypeUpdate;
     }
-    NSObject *dbExistModel = [self existObject:model];
+    NSObject *dbExistModel = [self xq_existObject:model];
     if (dbExistModel) {
         if (!updateIfExist) {
             return nil;
@@ -798,7 +810,7 @@ NSString *const kTableName = @"tableName";
                 NSNumber *deleted = [model valueForKey:PROP_TO_STRING(deleted)];
                 if (deleted.boolValue) {
                     *optType = DBOptTypeDelete;
-                    block = [self dbBlockForDeleteObject:model];
+                    block = [self xq_dbBlockForDeleteObject:model];
                 }
             }
             if (!block) {
@@ -806,8 +818,8 @@ NSString *const kTableName = @"tableName";
             }
         }
         if (!block) {
-            XQSQLCondition *condition = [model defaultExistConditionWithDbModel:dbExistModel];
-            block = [self dbBlockForUpdateObject:model
+            XQSQLCondition *condition = [model xq_defaultExistConditionWithDbModel:dbExistModel];
+            block = [self xq_dbBlockForUpdateObject:model
                                          dbModel:dbExistModel
                                        condition:condition];
         }
@@ -815,25 +827,25 @@ NSString *const kTableName = @"tableName";
         if (optType) {
             *optType = DBOptTypeAdd;
         }
-        block = [self dbBlockForInsertObject:model];
+        block = [self xq_dbBlockForInsertObject:model];
     }
     return [block copy];
 }
 
-+ (XQDBBlock)dbBlockForDeleteObject:(__kindof NSObject *)object {
-    if (![self existObject:object]) { //不存在
++ (XQDBBlock)xq_dbBlockForDeleteObject:(__kindof NSObject *)object {
+    if (![self xq_existObject:object]) { //不存在
         return nil;
     }
-    XQSQLCondition *condition = [object defaultExistCondition];
-    XQDBBlock block = [self dbBlockForDeleteObjectWithCondition:condition];
+    XQSQLCondition *condition = [object xq_defaultExistCondition];
+    XQDBBlock block = [self xq_dbBlockForDeleteObjectWithCondition:condition];
     return [block copy];
 }
 
-+ (XQDBBlock)dbBlockForDeleteObjectWithCondition:(XQSQLCondition *)condition {
++ (XQDBBlock)xq_dbBlockForDeleteObjectWithCondition:(XQSQLCondition *)condition {
     if (nil == condition) {
         return nil;
     }
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     NSString *tableName = tableDescribtion[kTableName];
     
     return [^BOOL(FMDatabase *db){
@@ -849,8 +861,10 @@ NSString *const kTableName = @"tableName";
 }
 
 #pragma mark - private func
-+ (NSString *)createSQL {
-    WCModelTableDescribtion *tableDescribtion = [self tableDescribtion];
++ (NSString *)xq_createSQL {
+    CALL_CHILD_IF_EXIST(createSQL)
+    
+    WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     WCModelDescribtion *fieldTypes = tableDescribtion[kFieldTypes];
     NSString *tableName = tableDescribtion[kTableName];
@@ -871,18 +885,18 @@ NSString *const kTableName = @"tableName";
         if (idx == fieldNames.count - 1) {
             formatString = @" `%@` %@ %@\n";
         }
-        [resultSQL appendFormat:formatString, fieldName, fieldType, [self fieldDescribe:fieldName]];
+        [resultSQL appendFormat:formatString, fieldName, fieldType, [self xq_fieldDescribe:fieldName]];
     }];
     [resultSQL appendString:@");"];
-    NSDictionary<NSString *, NSNumber *> *startDict = self.startValueForAutoIncrement;
+    NSDictionary<NSString *, NSNumber *> *startDict = self.xq_startValueForAutoIncrement;
     if (startDict.count > 0) {
         [startDict enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull fieldName, NSNumber * _Nonnull startValue, BOOL * _Nonnull stop) {
             if (startValue.longLongValue > 0) {
                 NSMutableString *fieldNames = [NSMutableString stringWithString:fieldName];
                 NSMutableString *fieldValues = [NSMutableString stringWithFormat:@"%@", startValue];
                 {
-                    NSArray *notNullFields = [self notNullFields];
-                    for (NSString *notNullField in notNullFields) {
+                    NSArray *xq_notNullFields = [self xq_notNullFields];
+                    for (NSString *notNullField in xq_notNullFields) {
                         if (![notNullField isEqualToString:fieldName]) {
                             [fieldNames appendString:@","];
                             [fieldNames appendString:notNullField];
@@ -902,13 +916,13 @@ NSString *const kTableName = @"tableName";
     return resultSQL;
 }
 
-+ (NSNumber *)safeNumberValue:(id)value {
++ (NSNumber *)xq_safeNumberValue:(id)value {
     if (![value isKindOfClass:NSNumber.class]) {
         if ([value respondsToSelector:@selector(longLongValue)]) {
             value = @([value longLongValue]);
         } else if ([value isKindOfClass:NSArray.class]) {
             value = [value firstObject];
-            value = [self safeNumberValue:value]; //递归计算
+            value = [self xq_safeNumberValue:value]; //递归计算
         } else {
             value = nil;
         }
@@ -916,7 +930,83 @@ NSString *const kTableName = @"tableName";
     return value;
 }
 
-+ (NSDictionary *)propTypeMapping {
++ (NSString*)xq_rawUUID {
+    NSString *uuid = nil;
+    CFUUIDRef puuid = CFUUIDCreate(nil);
+    CFStringRef uuidString = CFUUIDCreateString(nil, puuid);
+    uuid = (NSString *)CFBridgingRelease(CFStringCreateCopy(NULL, uuidString));
+    XQCFRelease(puuid);
+    XQCFRelease(uuidString);
+    return uuid;
+}
+
++ (NSArray *)xq_idsGroupByIds:(NSArray *)ids limitCount:(NSInteger)limitCount {
+    NSMutableArray<NSArray *> *idsGroup = [NSMutableArray array];
+    for (NSUInteger idx = 0; idx < ids.count; idx += limitCount) {
+        NSUInteger length = limitCount;
+        if (idx + limitCount > ids.count) {
+            length = ids.count - idx;
+        }
+        [idsGroup addObject:[ids subarrayWithRange:NSMakeRange(idx, length)]];
+    }
+    return idsGroup;
+}
+
+#pragma mark - meta data
+/**
+ *  获取表信息，包括字段名集合，字段类型集合，表名
+ *
+ *  return @{@"fieldNames": NSArray, @"fieldTypes":NSArray, @"tableName":NSString}
+ */
+
++ (NSCache *)xq_modelMetaDataCache {
+    static NSCache *s_modelMetaDataCache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_modelMetaDataCache = [[NSCache alloc] init];
+    });
+    return s_modelMetaDataCache;
+}
+
++ (WCModelTableDescribtion *)xq_tableDescribtion {
+    Class _class = [self class];
+    NSString *tableName = NSStringFromClass(_class);
+    NSString *cacheKey = [NSString stringWithFormat:@"%@_Describtion", tableName];
+    
+    if ([self.xq_modelMetaDataCache objectForKey:cacheKey]) {
+        return [self.xq_modelMetaDataCache objectForKey:cacheKey];
+    } else {
+        NSMutableArray<NSString *> *fieldNames = [NSMutableArray array];
+        NSMutableArray<NSString *> *fieldTypes = [NSMutableArray array];
+        
+        unsigned int outCount = 0;
+        while (NO == [NSStringFromClass(_class) isEqualToString:@"NSObject"]) {
+            objc_property_t *props = class_copyPropertyList(_class, &outCount);
+            [self xq_getFieldNames:fieldNames fieldTypes:fieldTypes props:props propsCount:outCount];
+            
+            _class = class_getSuperclass(_class);
+        }
+        WCModelTableDescribtion *result = @{kFieldNames:fieldNames,
+                                            kFieldTypes:fieldTypes,
+                                            kTableName:tableName};
+        [self.xq_modelMetaDataCache setObject:result forKey:cacheKey];
+        return result;
+    }
+}
+
++ (NSString *)xq_tableName {
+    return [self xq_tableDescribtion][kTableName];
+}
+
++ (WCModelDescribtion *)xq_fieldNames {
+    return [self xq_tableDescribtion][kFieldNames];
+}
+
++ (WCModelDescribtion *)xq_fieldTypes {
+    return [self xq_tableDescribtion][kFieldTypes];
+}
+
++ (NSDictionary *)xq_propTypeMapping {
     static NSDictionary *s_mapping;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -935,56 +1025,7 @@ NSString *const kTableName = @"tableName";
     return s_mapping;
 }
 
-/**
- *  获取表信息，包括字段名集合，字段类型集合，表名
- *
- *  return @{@"fieldNames": NSArray, @"fieldTypes":NSArray, @"tableName":NSString}
- */
-
-static WCModelCacheType *g_ModelBaseCache;
-+(void)load {
-    g_ModelBaseCache = [[NSCache alloc]init];
-}
-
-+ (WCModelTableDescribtion *)tableDescribtion {
-    Class _class = [self class];
-    NSString *tableName = NSStringFromClass(_class);
-    NSString *cacheKey = [NSString stringWithFormat:@"%@_Describtion", tableName];
-    
-    if ([g_ModelBaseCache objectForKey:cacheKey]) {
-        return [g_ModelBaseCache objectForKey:cacheKey];
-    } else {
-        NSMutableArray<NSString *> *fieldNames = [NSMutableArray array];
-        NSMutableArray<NSString *> *fieldTypes = [NSMutableArray array];
-        
-        unsigned int outCount = 0;
-        while (NO == [NSStringFromClass(_class) isEqualToString:@"NSObject"]) {
-            objc_property_t *props = class_copyPropertyList(_class, &outCount);
-            [self getFieldNames:fieldNames fieldTypes:fieldTypes props:props propsCount:outCount];
-            
-            _class = class_getSuperclass(_class);
-        }
-        WCModelTableDescribtion *result = @{kFieldNames:fieldNames,
-                                            kFieldTypes:fieldTypes,
-                                            kTableName:tableName};
-        [g_ModelBaseCache setObject:result forKey:cacheKey];
-        return result;
-    }
-}
-
-+ (NSString *)tableName {
-    return [self tableDescribtion][kTableName];
-}
-
-+ (WCModelDescribtion *)fieldNames {
-    return [self tableDescribtion][kFieldNames];
-}
-
-+ (WCModelDescribtion *)fieldTypes {
-    return [self tableDescribtion][kFieldTypes];
-}
-
-+ (void)getFieldTypes:(char (*)[64])fieldTypes attrStr:(const char *)attrStr {
++ (void)xq_getFieldTypes:(char (*)[64])fieldTypes attrStr:(const char *)attrStr {
     char *start = strstr(attrStr, "T@\"");
     if (start) {
         strcpy(*fieldTypes, start + strlen("T@\""));
@@ -1002,10 +1043,10 @@ static WCModelCacheType *g_ModelBaseCache;
     }
 }
 
-+ (void)getFieldNames:(NSMutableArray<NSString *> *)fieldNames
-           fieldTypes:(NSMutableArray<NSString *> *)fieldTypes
-                props:(objc_property_t *)props
-           propsCount:(unsigned int)propsCount{
++ (void)xq_getFieldNames:(NSMutableArray<NSString *> *)fieldNames
+              fieldTypes:(NSMutableArray<NSString *> *)fieldTypes
+                   props:(objc_property_t *)props
+              propsCount:(unsigned int)propsCount{
     for (int i = 0; i < propsCount; i++) {
         objc_property_t prop = props[i];
         static const char *const s_blacklist = ",R"; //readonly 属性不存储
@@ -1015,7 +1056,7 @@ static WCModelCacheType *g_ModelBaseCache;
         if (strstr(attrStr, s_blacklist) != NULL) {
             cpyDes[0] = 0;
         } else {
-            [self getFieldTypes:&cpyDes attrStr:attrStr];
+            [self xq_getFieldTypes:&cpyDes attrStr:attrStr];
         }
         if (strlen(cpyDes) > 0) {
             NSString *type = [NSString stringWithUTF8String:cpyDes];
@@ -1024,7 +1065,7 @@ static WCModelCacheType *g_ModelBaseCache;
                 XQLogWarn(@"field type:%@", type);
             }
 #endif
-            NSString *propType = XQRequiredCast([self propTypeMapping][type], NSString);
+            NSString *propType = XQRequiredCast([self xq_propTypeMapping][type], NSString);
             if (propType) {
                 [fieldTypes addObject:propType];
                 NSString *fieldName = [NSString stringWithUTF8String:property_getName(prop)];

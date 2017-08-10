@@ -194,38 +194,42 @@ NSString *const kIsNot = @"IS NOT";
     [self addWhereField:field compare:compare value:value];
 }
 
++ (instancetype)condition {
+    return [self new];
+}
+
 + (instancetype)conditionWhere:(NSString *)field equal:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareEqual value:value];
     return condition;
 }
 
 + (instancetype)conditionWhere:(NSString *)field notEqual:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareNotEqual value:value];
     return condition;
 }
 
 + (instancetype)conditionWhere:(NSString *)field greater:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareGreater value:value];
     return condition;
 }
 
 + (instancetype)conditionWhere:(NSString *)field lesser:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareLesser value:value];
     return condition;
 }
 
 + (instancetype)conditionWhere:(NSString *)field equalOrGreater:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareEqualOrGreater value:value];
     return condition;
 }
 
 + (instancetype)conditionWhere:(NSString *)field equalOrLesser:(id)value {
-    XQSQLCondition *condition = [XQSQLCondition new];
+    XQSQLCondition *condition = [self new];
     [condition where:field compare:SQLCompareEqualOrLesser value:value];
     return condition;
 }
