@@ -33,7 +33,9 @@ function traversingFiles()
 			filtCodeFile $file $1
 		fi
 	done
-	rm -f ./copy_license_file.txt
 }
 
 traversingFiles "."
+#清理文件
+rm -f ./copy_license_file.txt
+
