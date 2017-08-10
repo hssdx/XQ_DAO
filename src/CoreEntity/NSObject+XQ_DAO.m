@@ -23,7 +23,7 @@ SOFTWARE.
  */
 //
 //  ModelBase.m
-//  Lighting
+//  Xunquan
 //
 //  Created by Xiongxunquan on 9/12/15.
 //  Copyright © 2015 xunquan inc.. All rights reserved.

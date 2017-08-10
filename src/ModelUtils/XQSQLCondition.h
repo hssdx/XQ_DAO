@@ -23,7 +23,7 @@ SOFTWARE.
  */
 //
 //  SQLCondition.h
-//  Lighting
+//  Xunquan
 //
 //  Created by Xiongxunquan on 9/23/15.
 //  Copyright © 2015 xunquan inc.. All rights reserved.

@@ -23,7 +23,7 @@ SOFTWARE.
  */
 //
 //  ModelBlocks.h
-//  Lighting
+//  Xunquan
 //
 //  Created by Xiongxunquan on 9/14/15.
 //  Copyright © 2015 xunquan inc.. All rights reserved.

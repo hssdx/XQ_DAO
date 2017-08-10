@@ -23,7 +23,7 @@ SOFTWARE.
  */
 //
 //  MigrationItemBase.h
-//  Lighting
+//  Xunquan
 //
 //  Created by Xiongxunquan on 11/2/15.
 //  Copyright © 2015 xunquan inc.. All rights reserved.
