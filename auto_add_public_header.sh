@@ -18,12 +18,12 @@ function filtHeaderFile()
 	if [[ $filepath =~ $blackList ]]; then
 		return 1
 	fi
-	blackList="${project_name}.h"
-	if [[ $filepath =~ $blackList ]]; then
+
+	if [ $filename = "${project_name}.h" ]; then
 		return 2
 	fi
 	if [ "${filename##*.}" = "h" ]; then
-		echo "#import <XQKit/$filename>" >> $public_header_file_pod
+		echo "#import <${project_name}/$filename>" >> $public_header_file_pod
 		echo "#import \"$filename\"" >> $public_header_file_no_pod
 	fi
 }
@@ -45,8 +45,11 @@ function traversingFiles()
 
 traversingFiles "."
 
-
-cat "./LICENSE" > $result_file
+mkdir $project_name
+touch $result_file
+echo "/* " > $result_file
+cat "./LICENSE" >> $result_file
+echo " */" >> $result_file
 echo "#import <Foundation/Foundation.h>
 
 #if __has_include(<${project_name}/${project_name}.h>)
