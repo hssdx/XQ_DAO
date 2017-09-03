@@ -31,7 +31,13 @@ SOFTWARE.
 
 #import <Foundation/Foundation.h>
 
+@class XQMigrationItemBase;
+
 @interface XQMigrationService : NSObject
+
+@property (assign, nonatomic) NSInteger version;
+
+- (void)addMigrationItem:(XQMigrationItemBase *)migrationItem version:(NSInteger)version;
 
 - (void)startMigrationFromVersion:(int32_t)fromVersion toVersion:(int32_t)toVersion;
 

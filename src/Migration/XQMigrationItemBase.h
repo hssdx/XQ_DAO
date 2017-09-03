@@ -63,8 +63,18 @@ typedef NS_ENUM(NSInteger, FieldType) {
  *  @return 迁移版本号,对应db中databaseVersion字段.
  *  @如果返回17,表示当前迁移是版本16迁往版本17,每次只允许迁移一个版本编号,即不允许跨版本迁移.
  */
-- (NSUInteger)version;
-
+@property (assign, nonatomic) NSInteger version;
 @property (strong, nonatomic) NSMutableArray *optArray;
+
+
+- (void)addOperationWithType:(MigrationOperationType)optType
+                       table:(NSString *)table
+                    oldField:(NSString *)fieldOld
+                    newField:(NSString *)fieldNew
+                   fieldType:(FieldType)fieldTypeNew;
+
+- (void)addField:(NSString *)field forTable:(NSString *)table fieldType:(FieldType)fieldType;
+- (void)addBlock:(dispatch_block_t)block;
+- (void)deleteTable:(NSString *)tableName;
 
 @end

@@ -46,13 +46,95 @@ typedef NS_ENUM(NSInteger, DBOptType) {
  
  你可以复制下面的代码到你的类中
  
- @property (strong, nonatomic, readonly) NSNumber *localID;
- @property (strong, nonatomic, readonly) NSNumber *deleted;
- @property (copy, nonatomic, readonly) NSString *UUID;
+ @property (strong, nonatomic) NSNumber *localID;
+ @property (strong, nonatomic) NSNumber *deleted;
+ @property (copy, nonatomic) NSString *UUID;
  
  */
+#define XQ_DB_PROPERTY \
+@property (strong, nonatomic) NSNumber *localID; \
+@property (strong, nonatomic) NSNumber *deleted; \
+@property (copy, nonatomic) NSString *UUID;
+
+
+
+@interface XQDBModelConfiguration : NSObject
+
++ (instancetype)configuration;
+
+/**
+ @[PROP_TO_STRING(localID), PROP_TO_STRING(UUID)]
+ */
+@property (strong, nonatomic, readonly) NSMutableArray<NSString *> *uniquesAbleNull;
+@property (strong, nonatomic, readonly) NSMutableArray<NSString *> *uniquesNotNull;
+
+/**
+ @[PROP_TO_STRING(type)]
+ */
+@property (strong, nonatomic, readonly) NSMutableArray<NSString *> *notNullFields;
+
+
+/**
+ @[@{@"createTime", @(OrderTypeDESC)},
+   @{@"userId", @(OrderTypeASC)}]
+ */
+@property (strong, nonatomic, readonly) NSMutableArray<NSDictionary<NSString *, NSNumber *> *> *orderFieldInfo;
+
+/**
+ Default value is `localID`, 
+ * if not necessary, you'd better not set it up
+ */
+@property (copy, nonatomic) NSString *primaryKey;
+
+/**
+ This is the create-table‘s SQL for model
+ like:
+ create table 'User' if not exist {
+ ...
+ };
+ * if not necessary, you'd better not set it up
+ */
+@property (copy, nonatomic) NSString *createSQL;
+
+
+/**
+ This is the autoIncrement-primary-key start value. default is 100
+ * if not necessary, you'd better not set it up
+ */
+@property (strong, nonatomic, readonly) NSMutableDictionary<NSString *, NSNumber *> *startValueForAutoIncrement;
+
+
+/** recommend use below function to set value */
+/**
+ 不允许为空，不允许重复
+ */
+- (void)addUniquesNotNull:(NSArray *)objects;
+
+/**
+ 允许为空，不允许重复
+ */
+- (void)addUniquesAbleNull:(NSArray *)objects;
+/**
+ 不允许为空，允许重复
+ */
+- (void)addNotNullFields:(NSArray *)objects;
+/**
+ 排序信息，例如：
+ @[@{PROP_TO_STRING(modifyTime):@(OrderTypeDESC)},
+   @{PROP_TO_STRING(createTime):@(OrderTypeDESC)}];
+ */
+- (void)addOrderFieldInfo:(NSArray *)objects;
+/**
+ 自增字段的起始值，默认 100
+ */
+- (void)addStartValueForAutoIncrement:(NSDictionary *)objects;
+
+@end
+
+
 @protocol XQDBModel <NSObject>
 
+//使用 XQ_DB_PROPERTY 即可
 @required
 
 - (NSNumber *)localID;
@@ -60,12 +142,46 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 - (NSNumber *)deleted;
 
 @optional
-+ (NSArray<NSString *> *)child_uniquesAbleNull;
-+ (NSArray<NSString *> *)child_uniquesNotNull;
-+ (NSArray<NSString *> *)child_notNullFields;
-+ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)child_orderSQLsArray;
 
-+ (NSString *)child_primaryKey;
+/*
+ ====================================================
+   下面的大部分方法可通过 XQDBModelConfiguration 进行配置
+ ====================================================
+ */
+/*
+ 重写下面的方法，请实现 <XQDBModel> 协议，并改 `xq_` 前缀为 `child_`
+ 例如:
+ // assetId 是一个允许为空的唯一 id，它默认只能被写入一次，在它为 null 时，允许重复，但是对于有效数据不允许重复
+ // !! 注意：写入有效数据时，要注意合并等情况的发生
+ + (NSArray<NSString *> *)child_uniquesAbleNull {
+    NSMutableArray *fields = [[self xq_uniquesAbleNull] mutableCopy];
+    [fields addObject:PROP_TO_STRING(assetId)];
+    return fields;
+ }
+ //表示不允许为空的字段
+ + (NSArray<NSString *> *)child_notNullFields {
+    NSMutableArray *fields = [[self xq_notNullFields] mutableCopy];
+    [fields addObject:PROP_TO_STRING(dateTime)];
+    [fields addObject:PROP_TO_STRING(type)];
+    [fields addObject:PROP_TO_STRING(addType)];
+    [fields addObject:PROP_TO_STRING(ownerId)];
+    [fields addObject:PROP_TO_STRING(uploaderId)];
+    return fields;
+ }
+ //排序字段，按照前后顺序优先级排序
+ + (NSArray<NSDictionary<NSString *, NSNumber *> *> *)child_orderFieldInfo {
+    return @[@{PROP_TO_STRING(netDateTaken):@(OrderTypeDESC)},
+             @{PROP_TO_STRING(dateTaken):@(OrderTypeDESC)},
+             @{PROP_TO_STRING(createTime):@(OrderTypeDESC)}];
+ }
+ 
+ */
++ (NSArray<NSString *> *)child_uniquesAbleNull __attribute__((deprecated("use XQDBModelConfiguration")));
++ (NSArray<NSString *> *)child_uniquesNotNull __attribute__((deprecated("use XQDBModelConfiguration")));
++ (NSArray<NSString *> *)child_notNullFields __attribute__((deprecated("use XQDBModelConfiguration")));
++ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)child_orderFieldInfo __attribute__((deprecated("use XQDBModelConfiguration")));
+
++ (NSString *)child_primaryKey __attribute__((deprecated("use XQDBModelConfiguration")));
 
 + (BOOL)child_isPrimaryKey:(NSString *)field;
 + (BOOL)child_isUnchangeableField:(NSString *)field;
@@ -74,7 +190,7 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 /**
  字段描述，建议默认
  */
-+ (NSString *)child_createSQL;
++ (NSString *)child_createSQL __attribute__((deprecated("use XQDBModelConfiguration")));
 
 
 /**
@@ -85,7 +201,7 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 /**
  自增字段的起始值，用于保留特殊 ID，建议默认
  */
-+ (NSDictionary<NSString *, NSNumber *> *)child_startValueForAutoIncrement;
++ (NSDictionary<NSString *, NSNumber *> *)child_startValueForAutoIncrement __attribute__((deprecated("use XQDBModelConfiguration")));
 
 /**
  默认判断存在的查询条件，默认根据uniqueIndexes生成，建议默认
@@ -105,7 +221,13 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 
 @end
 
+
+
 @interface NSObject (XQ_DAO)
+
+#pragma mark - configuration
++ (XQDBModelConfiguration *)xq_modelConfiguration;
++ (void)setXq_modelConfiguration:(XQDBModelConfiguration *)configuration;
 
 /**
  helper
@@ -155,7 +277,7 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 + (NSUInteger)xq_countOfCol;
 + (NSUInteger)xq_countOfWhereProp:(NSString *)prop equal:(id)value;
 + (NSUInteger)xq_countOfWhereProp:(NSString *)prop notEqual:(id)value;
-+ (NSUInteger)xq_countOfCondition:(XQSQLCondition *)condition;
++ (NSUInteger)xq_countOfMakeCondition:(void(^)(XQSQLCondition *condition))makeCondition;
 /**
  *  删除 model
  */
@@ -171,34 +293,6 @@ typedef NS_ENUM(NSInteger, DBOptType) {
 + (BOOL)xq_clean;
 
 #pragma mark - 选择重写
-/*
- 重写下面的方法，请实现 <XQDBModel> 协议，并改 `xq_` 前缀为 `child_`
- 例如:
- // assetId 是一个允许为空的唯一 id，它默认只能被写入一次，在它为 null 时，允许重复，但是对于有效数据不允许重复
- // !! 注意：写入有效数据时，要注意合并等情况的发生
- + (NSArray<NSString *> *)child_uniquesAbleNull {
-    NSMutableArray *fields = [[self xq_uniquesAbleNull] mutableCopy];
-    [fields addObject:PROP_TO_STRING(assetId)];
-    return fields;
- }
- //表示不允许为空的字段
- + (NSArray<NSString *> *)child_notNullFields {
-    NSMutableArray *fields = [[self xq_notNullFields] mutableCopy];
-    [fields addObject:PROP_TO_STRING(dateTime)];
-    [fields addObject:PROP_TO_STRING(type)];
-    [fields addObject:PROP_TO_STRING(addType)];
-    [fields addObject:PROP_TO_STRING(ownerId)];
-    [fields addObject:PROP_TO_STRING(uploaderId)];
-    return fields;
- }
- //排序字段，按照前后顺序优先级排序
- + (NSArray<NSDictionary<NSString *, NSNumber *> *> *)child_orderSQLsArray {
-    return @[@{PROP_TO_STRING(netDateTaken):@(OrderTypeDESC)},
-             @{PROP_TO_STRING(dateTaken):@(OrderTypeDESC)},
-             @{PROP_TO_STRING(createTime):@(OrderTypeDESC)}];
- }
- 
- */
 /**
  唯一的，但是允许为NULL，没有强制唯一约束，但是不允许更新该字段
  并且一次事物中如果有2条以上记录出现同样的值，会忽略前面的那个，并报警告
@@ -220,7 +314,7 @@ typedef NS_ENUM(NSInteger, DBOptType) {
  排序字段，可自定义，因为dict是无序的，所以数组里每个dict只能有一个key，value
  example: @[@{PROP_TO_STRING(localID):@(OrderTypeDESC)}]
  */
-+ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderSQLsArray;
++ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderFieldInfo;
 
 
 + (BOOL)xq_isPrimaryKey:(NSString *)field;

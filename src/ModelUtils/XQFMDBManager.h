@@ -32,6 +32,7 @@ SOFTWARE.
 #import <Foundation/Foundation.h>
 
 @class FMDatabase;
+@class XQMigrationService;
 
 typedef BOOL (^XQDBBlock)(FMDatabase *db);
 
@@ -50,6 +51,8 @@ typedef BOOL (^XQDBBlock)(FMDatabase *db);
 
 - (void)executeBlocksInTransaction:(NSArray<XQDBBlock> *)blocks;
 
-- (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes version:(uint32_t)version;
+/*创建模型对象 与 sql 表，模型对象需要实现 <XQDBModel> 协议*/
+- (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes
+                migrationService:(XQMigrationService *)migrationService;
 
 @end

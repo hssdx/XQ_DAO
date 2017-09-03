@@ -32,6 +32,7 @@ SOFTWARE.
 #import "XQFMDBManager.h"
 #import "XQDatabaseQueue.h"
 #import "XQMigrationService.h"
+#import "XQMigrationItemBase.h"
 #import "NSObject+XQ_DAO.h"
 
 #import <FMDB/FMDB.h>
@@ -170,23 +171,36 @@ SOFTWARE.
     }
 }
 
-- (void)setupForClasses:(NSArray<NSString *> *)classes version:(uint32_t)version {
+- (XQMigrationService *)setupMigrationService:(XQMigrationService *)service {
+    if (service == nil) {
+        service = [XQMigrationService new];
+    }
+    XQMigrationItemBase *migrationItem = [XQMigrationItemBase new];
+    [service addMigrationItem:migrationItem version:2];
+    return service;
+}
+
+- (void)setupForClasses:(NSArray<NSString *> *)classes migrationService:(XQMigrationService *)migrationService {
     [self executeBlock:^BOOL(FMDatabase *db) {
-        __block BOOL res = NO;
-        uint32_t userVersion = [db userVersion];
-        if (0 == userVersion) { // 版本应该大于 0 开始
-            db.userVersion = version;
-            self.version = version;
+        uint32_t toVersion = (uint32_t)migrationService.version;
+        if (toVersion == 0) {
+            toVersion = 1;
         }
-        if (userVersion != version) {
+        __block BOOL res = NO;
+        uint32_t fromVersion = [db userVersion];
+        if (0 == fromVersion) { // 版本应该大于 0 开始
+            db.userVersion = toVersion;
+            self.version = toVersion;
+            fromVersion = toVersion;
+        }
+        if (fromVersion != toVersion) {
             //TODO: 目前仅支持增加字段和删除表，不支持删除字段和修改字段
-            XQMigrationService *migration = [XQMigrationService new];
-            [migration startMigrationFromVersion:userVersion toVersion:version];
-            db.userVersion = version;
-            self.version = version;
+            [migrationService startMigrationFromVersion:fromVersion toVersion:toVersion];
+            db.userVersion = toVersion;
+            self.version = toVersion;
             XQLog(@"database migration!");
         } else {
-            XQLog(@"database version:%d", userVersion);
+            XQLog(@"database version:%d", fromVersion);
         }
         [classes enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             Class cls = NSClassFromString(obj);
@@ -201,9 +215,10 @@ SOFTWARE.
     }];
 }
 
-- (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes version:(uint32_t)version {
+- (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes
+                migrationService:(XQMigrationService *)migrationService {
     XQLog(@">>>>>安装数据库");
-    [self setupForClasses:classes version:version];
+    [self setupForClasses:classes migrationService:migrationService];
     XQLog(@"数据库文件是否存在:%@", @([self isDBFileExist]));
 #if DEBUG
     if (![self isDBFileExist]) {

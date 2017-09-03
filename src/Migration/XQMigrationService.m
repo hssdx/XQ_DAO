@@ -30,14 +30,14 @@ SOFTWARE.
 //
 
 #import "XQMigrationService.h"
-#import "XQMigrationItemBase+Protect.h"
+#import "XQMigrationItemBase.h"
 #import "XQFMDBManager.h"
 #import <FMDB/FMDB.h>
 #import <XQKit/XQKit.h>
 
 @interface XQMigrationService()
 
-@property (strong, nonatomic) NSDictionary *migrationOptDict;
+@property (strong, nonatomic) NSMutableDictionary<NSNumber *, XQMigrationItemBase *> *migrationOptDict;
 
 @end
 
@@ -45,9 +45,14 @@ SOFTWARE.
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.migrationOptDict = @{};
+        _migrationOptDict = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (void)addMigrationItem:(XQMigrationItemBase *)migrationItem version:(NSInteger)version {
+    XQAssert(migrationItem && version > 1); //从版本 2开始
+    [_migrationOptDict setObject:migrationItem forKey:@(version)];
 }
 
 - (NSString *)showTable:(NSString *)tableName {

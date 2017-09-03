@@ -29,29 +29,13 @@ SOFTWARE.
 //  Copyright © 2015 xunquan inc.. All rights reserved.
 //
 
-#import "XQMigrationItemBase+Protect.h"
+#import "XQMigrationItemBase.h"
 
 @implementation FPMigrationOperationItem
 
 @end
 
 @implementation XQMigrationItemBase
-
-- (instancetype)init {
-    if (self = [super init]) {
-        [self loadOperationItem];
-    }
-    return self;
-}
-
-- (void)loadOperationItem {
-    NSAssert(false, @"子类需要实现");
-}
-
-- (NSUInteger)version {
-    NSAssert(false, @"子类需要实现");
-    return 0;
-}
 
 - (NSMutableArray *)optArray {
     if (_optArray == nil) {

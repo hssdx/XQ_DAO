@@ -29,6 +29,9 @@ SOFTWARE.
 //  Copyright © 2015 xunquan inc.. All rights reserved.
 //
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #import "NSObject+XQ_DAO.h"
 #import "XQSQLCondition.h"
 #import "XQFMDBManager.h"
@@ -39,6 +42,10 @@ SOFTWARE.
 #import <XQKit/XQKit.h>
 #import <YYKit/YYKit.h>
 
+#define RETURN_IF_CONFIGURATION_EXIST(_SEL) \
+if (self.xq_modelConfiguration._SEL) { \
+    return self.xq_modelConfiguration._SEL; \
+}
 
 #define CALL_CHILD_IF_EXIST(_SEL) \
 if ([self respondsToSelector:@selector(child_##_SEL)]) { \
@@ -63,9 +70,67 @@ typedef NSArray<NSString *> WCModelDescribtion;
 typedef NSDictionary<NSString *, id> WCModelTableDescribtion;
 typedef NSCache<NSString *, WCModelTableDescribtion *> WCModelCacheType;
 
-NSString *const kFieldNames = @"fieldNames";
-NSString *const kFieldTypes = @"fieldTypes";
-NSString *const kTableName = @"tableName";
+NSString *const kFieldNames = @"xq_fieldNames";
+NSString *const kFieldTypes = @"xq_fieldTypes";
+NSString *const kTableName = @"xq_tableName";
+
+static char xq_model_configuration_key;
+
+@implementation XQDBModelConfiguration
+
++ (instancetype)configuration {
+    XQDBModelConfiguration *configuration = [[self alloc] init];
+    [configuration addUniquesNotNull:@[PROP_TO_STRING(UUID)]];
+    [configuration addUniquesNotNull:@[PROP_TO_STRING(localID)]];
+    return configuration;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _uniquesAbleNull = [NSMutableArray array];
+        _uniquesNotNull = [NSMutableArray array];
+        _notNullFields = [NSMutableArray array];
+        _orderFieldInfo = [NSMutableArray array];
+        _startValueForAutoIncrement = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
+
+- (void)addUniquesNotNull:(NSArray *)objects {
+    if (objects.count == 0) {
+        return;
+    }
+    [_uniquesNotNull addObjectsFromArray:objects];
+    [self addUniquesAbleNull:objects];
+    [self addNotNullFields:objects];
+}
+
+- (void)addUniquesAbleNull:(NSArray *)objects {
+    if (objects.count == 0) {
+        return;
+    }
+    [_uniquesAbleNull addObjectsFromArray:objects];
+}
+
+- (void)addNotNullFields:(NSArray *)objects {
+    if (objects.count == 0) {
+        return;
+    }
+    [_notNullFields addObjectsFromArray:objects];
+}
+
+- (void)addOrderFieldInfo:(NSArray *)objects {
+    if (objects.count == 0) {
+        return;
+    }
+    [_orderFieldInfo addObjectsFromArray:objects];
+}
+
+- (void)addStartValueForAutoIncrement:(NSDictionary *)objects {
+    [_startValueForAutoIncrement addEntriesFromDictionary:objects];
+}
+
+@end
 
 @implementation NSObject (XQ_DAO)
 
@@ -79,30 +144,44 @@ NSString *const kTableName = @"tableName";
     [self swizzle_setLocalID:localID];
 }
 
+#pragma mark - configuration
++ (XQDBModelConfiguration *)xq_modelConfiguration {
+    return objc_getAssociatedObject(self, &xq_model_configuration_key);
+}
+
++ (void)setXq_modelConfiguration:(XQDBModelConfiguration *)configuration {
+    objc_setAssociatedObject(self, &xq_model_configuration_key, configuration, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 #pragma mark - override func
 
 + (NSArray<NSString *> *)xq_uniquesAbleNull {
+    RETURN_IF_CONFIGURATION_EXIST(uniquesAbleNull)
     CALL_CHILD_IF_EXIST(uniquesAbleNull)
     return [self xq_uniquesNotNull];
 }
 
 + (NSArray<NSString *> *)xq_uniquesNotNull {
+    RETURN_IF_CONFIGURATION_EXIST(uniquesNotNull)
     CALL_CHILD_IF_EXIST(uniquesNotNull)
     return @[PROP_TO_STRING(localID),
              PROP_TO_STRING(UUID)];
 }
 
 + (NSArray<NSString *> *)xq_notNullFields {
+    RETURN_IF_CONFIGURATION_EXIST(notNullFields)
     CALL_CHILD_IF_EXIST(notNullFields)
     return [self xq_uniquesNotNull];
 }
 
-+ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderSQLsArray {
-    CALL_CHILD_IF_EXIST(orderSQLsArray)
++ (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderFieldInfo {
+    RETURN_IF_CONFIGURATION_EXIST(orderFieldInfo)
+    CALL_CHILD_IF_EXIST(orderFieldInfo)
     return @[@{PROP_TO_STRING(localID):@(OrderTypeDESC)}];
 }
 
 + (NSString *)xq_primaryKey {
+    RETURN_IF_CONFIGURATION_EXIST(primaryKey)
     CALL_CHILD_IF_EXIST(primaryKey)
     return PROP_TO_STRING(localID);
 }
@@ -178,6 +257,7 @@ NSString *const kTableName = @"tableName";
 }
 
 + (NSDictionary<NSString *, NSNumber *> *)xq_startValueForAutoIncrement {
+    RETURN_IF_CONFIGURATION_EXIST(startValueForAutoIncrement)
     CALL_CHILD_IF_EXIST(startValueForAutoIncrement)
     return @{PROP_TO_STRING(localID):@100};
 }
@@ -337,7 +417,7 @@ NSString *const kTableName = @"tableName";
         }
     }];
     [self xq_deleteObjectsInTransaction:deleteModels];
-    [self _saveObjectsInTransaction:saveModels updateIfExist:updateIfExist];
+    [self _xq_saveObjectsInTransaction:saveModels updateIfExist:updateIfExist];
     if (deleteModels.count > 0) {
         [self xqNotifyAction:@"DeleteModels" withObject:deleteModels];
 //        [[NSNotificationCenter defaultCenter] notifyModelDelete:deleteModels];
@@ -352,7 +432,7 @@ NSString *const kTableName = @"tableName";
     [self xq_saveObjectsInTransaction:objects updateIfExist:YES];
 }
 
-+ (void)_saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects updateIfExist:(BOOL)updateIfExist {
++ (void)_xq_saveObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects updateIfExist:(BOOL)updateIfExist {
     if (objects.count == 0) {
         return;
     }
@@ -557,7 +637,7 @@ NSString *const kTableName = @"tableName";
         }
         [sql appendFormat:@" from %@ ", tableName];
         if (condition.orderSQLs.count == 0) {
-            [[self xq_orderSQLsArray] enumerateObjectsUsingBlock:
+            [[self xq_orderFieldInfo] enumerateObjectsUsingBlock:
              ^(NSDictionary<NSString *,NSNumber *> * _Nonnull obj,
                NSUInteger idx, BOOL * _Nonnull stop) {
                  XQAssert(obj.count == 1);
@@ -705,6 +785,15 @@ NSString *const kTableName = @"tableName";
 + (NSUInteger)xq_countOfWhereProp:(NSString *)prop notEqual:(id)value {
     XQSQLCondition *condition = [XQSQLCondition new];
     [condition addWhereField:prop compare:SQLCompareNotEqual value:value logicCode:LogicCodeNone];
+    return [self xq_countOfCondition:condition];
+}
+
++ (NSUInteger)xq_countOfMakeCondition:(void(^)(XQSQLCondition *condition))makeCondition {
+    XQSQLCondition *condition;
+    if (makeCondition) {
+        condition = [XQSQLCondition condition];
+        makeCondition(condition);
+    }
     return [self xq_countOfCondition:condition];
 }
 
@@ -885,6 +974,7 @@ NSString *const kTableName = @"tableName";
 
 #pragma mark - private func
 + (NSString *)xq_createSQL {
+    RETURN_IF_CONFIGURATION_EXIST(createSQL)
     CALL_CHILD_IF_EXIST(createSQL)
     
     WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
@@ -1099,3 +1189,5 @@ NSString *const kTableName = @"tableName";
 }
 
 @end
+
+#pragma clang diagnostic pop
