@@ -1,5 +1,5 @@
 # XQ_DAO
-基于 FMDB，十分方便继承的数据库访问工具，避免写 SQL 语句的烦恼
+基于 FMDB，十分方便、轻量的数据库组件，避免写 SQL 语句的烦恼
 
 # XQ_DAO
 
@@ -112,4 +112,5 @@ XQ_DB_PROPERTY
 [User xq_deleteWhere:PROP_TO_STRING(userId) equal:@1]
 
 
-## SQLCondition 是增加 SQL 查询条件的辅助类，对 SQL 语句的简单抽象
+## XQSQLCondition 用于生成 SQL 查询语句，是对 SQL 语句的简单抽象封装
+
