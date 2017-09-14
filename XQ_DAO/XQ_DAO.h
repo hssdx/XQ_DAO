@@ -29,9 +29,7 @@ FOUNDATION_EXPORT double XQ_DAOVersionNumber;
 FOUNDATION_EXPORT const unsigned char XQ_DAOVersionString[];
 
 
-#import <XQ_DAO/XQ_DAO.h>
 #import <XQ_DAO/NSObject+XQ_DAO.h>
-#import <XQ_DAO/XQMigrationItemBase+Protect.h>
 #import <XQ_DAO/XQMigrationItemBase.h>
 #import <XQ_DAO/XQMigrationService.h>
 #import <XQ_DAO/XQDatabaseQueue.h>
@@ -46,9 +44,7 @@ FOUNDATION_EXPORT const unsigned char XQ_DAOVersionString[];
 #else
 
 
-#import "XQ_DAO.h"
 #import "NSObject+XQ_DAO.h"
-#import "XQMigrationItemBase+Protect.h"
 #import "XQMigrationItemBase.h"
 #import "XQMigrationService.h"
 #import "XQDatabaseQueue.h"
