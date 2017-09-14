@@ -9,6 +9,8 @@
 
 首先你得创建一个 User  实例
 
+
+
 @interface User : NSObject <XQDBModel>
 
 XQ_DB_PROPERTY
@@ -71,26 +73,41 @@ XQ_DB_PROPERTY
 }
 
 
+
 然后就可以使用 User 这个 entity 了：
 ## 添加一份数据：
+
+
+
     User *user = [User new];
     user.userId = @1;
     user.nick = @"昵称";
     user.userName = @"小明";
     [user xq_save];
     
+    
+    
 ## 查询这份数据：
+
+
 
     User *user = [User xq_queryMakeCondition:^(XQSQLCondition *condition) {
         [condition andWhere:PROP_TO_STRING(userId) equal:@1];
     }];
     
+    
+    
 或者
     
+    
+    
     NSArray<User *> *users = [User xq_queryModels];
 
 
+
 ## 批量增加数据：
+
+
 
     NSMutableArray<User *> *users = [@[] mutableCopy];
     for (NSUInteger idx = 0; idx < 5; ++idx) {
@@ -101,15 +118,24 @@ XQ_DB_PROPERTY
     }
     [User xq_saveObjectsInTransaction:models];
     
+    
+    
 ## 修改操作和增加数据操作一样
 
 ## 清空这个表
 
+
+
 [User xq_clean];
+
+
 
 ## 删除一个数据
 
+
+
 [User xq_deleteWhere:PROP_TO_STRING(userId) equal:@1]
+
 
 
 ## XQSQLCondition 用于生成 SQL 查询语句，是对 SQL 语句的简单抽象封装
