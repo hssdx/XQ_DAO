@@ -58,7 +58,6 @@ SOFTWARE.
 
 @interface XQDefaultsStoreBase : NSObject
 
-+ (instancetype)sharedStore;
 - (NSUserDefaults *)userDefaults;
 - (BOOL)synchronize;
 /**
