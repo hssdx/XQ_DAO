@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "XQ_DAO"
-  s.version      = "1.0"
+  s.version      = "1.1"
   s.summary      = "XQ_DAO base on FMDB"
 
   s.description  = <<-DESC
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.authors      = { "hssdx" => "hssdx@qq.com" }
   s.platform     = :ios, "8.0"
   s.source       = { :git => "https://github.com/hssdx/XQ_DAO.git", :tag => s.version }
-  
+
   s.source_files  = "XQ_DAO/XQ_DAO.h", "src/*.{h,m}", "src/**/*.{h,m}"
 
   s.public_header_files = "XQ_DAO/XQ_DAO.h", "src/*.{h}", "src/**/*.{h}"
