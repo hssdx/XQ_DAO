@@ -35,7 +35,6 @@ FOUNDATION_EXPORT const unsigned char XQ_DAOVersionString[];
 #import <XQ_DAO/XQDatabaseQueue.h>
 #import <XQ_DAO/XQFMDBManager.h>
 #import <XQ_DAO/XQSQLCondition.h>
-#import <XQ_DAO/NSArray+XQUtils.h>
 #import <XQ_DAO/XQDefaultsStoreBase.h>
 #import <XQ_DAO/XQEntityUtils.h>
 #import <XQ_DAO/XQModelBlocks.h>
@@ -50,7 +49,6 @@ FOUNDATION_EXPORT const unsigned char XQ_DAOVersionString[];
 #import "XQDatabaseQueue.h"
 #import "XQFMDBManager.h"
 #import "XQSQLCondition.h"
-#import "NSArray+XQUtils.h"
 #import "XQDefaultsStoreBase.h"
 #import "XQEntityUtils.h"
 #import "XQModelBlocks.h"

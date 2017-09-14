@@ -35,7 +35,6 @@ SOFTWARE.
 #import "NSObject+XQ_DAO.h"
 #import "XQSQLCondition.h"
 #import "XQFMDBManager.h"
-#import "NSArray+XQUtils.h"
 
 #import <objc/runtime.h>
 #import <FMDB/FMDB.h>

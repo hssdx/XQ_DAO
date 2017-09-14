@@ -27,7 +27,6 @@
 		9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD741F3B50C100136FEC /* XQSQLCondition.m */; };
 		9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */; };
 		9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */; };
-		98B193681F5BDBD8003ADE7A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 98B193671F5BDBD8003ADE7A /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -304,7 +303,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98B193681F5BDBD8003ADE7A /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
