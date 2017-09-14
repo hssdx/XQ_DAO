@@ -25,8 +25,6 @@
 		9875FD861F3B50C100136FEC /* XQFMDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD721F3B50C100136FEC /* XQFMDBManager.m */; };
 		9875FD871F3B50C100136FEC /* XQSQLCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD731F3B50C100136FEC /* XQSQLCondition.h */; };
 		9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD741F3B50C100136FEC /* XQSQLCondition.m */; };
-		9875FD891F3B50C100136FEC /* NSArray+XQUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */; };
-		9875FD8A1F3B50C100136FEC /* NSArray+XQUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */; };
 		9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */; };
 		9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */; };
 		98B193681F5BDBD8003ADE7A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 98B193671F5BDBD8003ADE7A /* Info.plist */; };
@@ -66,8 +64,6 @@
 		9875FD721F3B50C100136FEC /* XQFMDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQFMDBManager.m; sourceTree = "<group>"; };
 		9875FD731F3B50C100136FEC /* XQSQLCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQSQLCondition.h; sourceTree = "<group>"; };
 		9875FD741F3B50C100136FEC /* XQSQLCondition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQSQLCondition.m; sourceTree = "<group>"; };
-		9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+XQUtils.h"; sourceTree = "<group>"; };
-		9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+XQUtils.m"; sourceTree = "<group>"; };
 		9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQDefaultsStoreBase.h; sourceTree = "<group>"; };
 		9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQDefaultsStoreBase.m; sourceTree = "<group>"; };
 		98B193671F5BDBD8003ADE7A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -158,8 +154,6 @@
 				9875FD661F3B50C100136FEC /* XQEntityUtils.h */,
 				9875FD671F3B50C100136FEC /* Migration */,
 				9875FD6D1F3B50C100136FEC /* ModelUtils */,
-				9875FD751F3B50C100136FEC /* NSArray+XQUtils.h */,
-				9875FD761F3B50C100136FEC /* NSArray+XQUtils.m */,
 				9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */,
 				9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */,
 			);
@@ -214,7 +208,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9875FD891F3B50C100136FEC /* NSArray+XQUtils.h in Headers */,
 				9875FD851F3B50C100136FEC /* XQFMDBManager.h in Headers */,
 				9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */,
 				9875FD791F3B50C100136FEC /* NSObject+XQ_DAO.h in Headers */,
@@ -365,7 +358,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9875FD8A1F3B50C100136FEC /* NSArray+XQUtils.m in Sources */,
 				9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */,
 				9875FD861F3B50C100136FEC /* XQFMDBManager.m in Sources */,
 				9875FD7F1F3B50C100136FEC /* XQMigrationItemBase.m in Sources */,
