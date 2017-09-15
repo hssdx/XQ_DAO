@@ -120,3 +120,7 @@ for (NSUInteger idx = 0; idx < 5; ++idx) {
 ```
 ## XQSQLCondition 用于生成 SQL 查询语句，是对 SQL 语句的简单抽象封装
 
+## license
+```
+MIT
+```
