@@ -104,7 +104,7 @@ for (NSUInteger idx = 0; idx < 5; ++idx) {
 	User *user = [User new];
 	user.nick = [NSString stringWithFormat:@"user_%@", @(self.datasource.count+1+idx)];
 	user.userId = @(idx+100); //特别地，如果不写这句，控制台会报出警告，因为 userId 是唯一并且不允许为 nil 的
-	[users addObject:model];
+	[users addObject:user];
 }
 [User xq_saveObjectsInTransaction:users];
 ```
