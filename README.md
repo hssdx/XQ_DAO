@@ -106,7 +106,7 @@ for (NSUInteger idx = 0; idx < 5; ++idx) {
 	user.userId = @(idx+100); //特别地，如果不写这句，控制台会报出警告，因为 userId 是唯一并且不允许为 nil 的
 	[users addObject:model];
 }
-[User xq_saveObjectsInTransaction:models];
+[User xq_saveObjectsInTransaction:users];
 ```
 ## 修改操作和增加数据操作一样
 
