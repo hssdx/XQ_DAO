@@ -1,0 +1,31 @@
+pod spec 过程
+
+参考：
+http://www.jianshu.com/p/d7d1942dd3f1
+
+1. pod spec create [project name]
+2. 编辑 pod 文件 (http://www.jianshu.com/p/d7d1942dd3f1)
+3. pod lib lint --verbose 直到通过
+    - 如果出现需要吧尖括号改成双引号引入外部库的 error，改成 #import <YYKit/YYKit.h> 之类(https://github.com/CocoaPods/CocoaPods/issues/3913) 和 (https://github.com/mxcl/PromiseKit/pull/438/commits/2bf7247a0fe6a4789f36325c0c4b729574bda9a3)
+    - 如果有警告，加上--allow-warnings 忽略警告
+    - 出现[project name] passed validation.表示成功
+4. git tag -a 1.0 -m "first release with podspec" 
+5. git push —tags
+6. pod trunk push [project name].podspec --allow-warnings
+    - 全程参考 https://guides.cocoapods.org/making/getting-setup-with-trunk.html
+    - pod trunk 需要注册，在注册前务必先为项目添加 LICENSE 文件(https://stackoverflow.com/questions/27231690/pod-trunk-push-error)
+    - pod trunk register orta@cocoapods.org 'Orta Therox' --description='macbook air'
+    - pod trunk me
+    - pod trunk push [NAME.podspec] --allow-warnings
+    - 私有库：pod repo push REPO [NAME.podspec]
+    - 
+7. pod search [project name] 看看是否成功
+
+
+
+
+8.私有库
+
+pod lib lint --sources='git@[自己的私有 repo 地址].git,https://github.com/CocoaPods/Specs.git' --use-libraries --allow-warnings --no-clean --verbose
+
+pod repo push [私有库 repo 名称] [project name].podspec --sources='git@[自己的私有 repo 地址].git,https://github.com/CocoaPods/Specs.git' --use-libraries --allow-warnings 
