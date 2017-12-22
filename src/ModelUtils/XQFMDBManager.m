@@ -34,10 +34,10 @@ SOFTWARE.
 #import "XQMigrationService.h"
 #import "XQMigrationItemBase.h"
 #import "NSObject+XQ_DAO.h"
+#import "XQ_DAOUtils.h"
 
+#import <UIKit/UIKit.h>
 #import <FMDB/FMDB.h>
-#import <YYKit/YYKit.h>
-#import <XQKit/XQKit.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -70,11 +70,11 @@ SOFTWARE.
     return path;
 }
 
-+ (YYThreadSafeDictionary *)managersDict {
-    static YYThreadSafeDictionary *s_managersDict;
++ (NSMutableDictionary *)managersDict {
+    static NSMutableDictionary *s_managersDict;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_managersDict = [YYThreadSafeDictionary dictionary];
+        s_managersDict = [NSMutableDictionary dictionary];
     });
     return s_managersDict;
 }
@@ -135,7 +135,7 @@ SOFTWARE.
         if ([self.db open])
             block(self.db);
         else
-            XQLog(@"can't open");
+            XQDAOLog(@"can't open");
     }
     else{
         [self.dbQueue inDatabase:^(FMDatabase *db){
@@ -147,14 +147,14 @@ SOFTWARE.
 
 - (void)executeBlocksInTransaction:(NSArray<XQDBBlock> *)blocks {
     if ([self.dbQueue isNestedQueue]) {
-        XQLog(@"在一个自身的 db queue 里未退出，无法启动事务操作模式");
+        XQDAOLog(@"在一个自身的 db queue 里未退出，无法启动事务操作模式");
         if ([self.db open]) {
             [blocks enumerateObjectsUsingBlock:^(XQDBBlock  _Nonnull block, NSUInteger idx, BOOL * _Nonnull stop) {
                 block(self.db);
             }];
         }
         else {
-            XQLog(@"can't open");
+            XQDAOLog(@"can't open");
         }
     }
     else {
@@ -198,9 +198,9 @@ SOFTWARE.
             [migrationService startMigrationFromVersion:fromVersion toVersion:toVersion];
             db.userVersion = toVersion;
             self.version = toVersion;
-            XQLog(@"database migration!");
+            XQDAOLog(@"database migration!");
         } else {
-            XQLog(@"database version:%d", fromVersion);
+            XQDAOLog(@"database version:%d", fromVersion);
         }
         [classes enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             Class cls = NSClassFromString(obj);
@@ -208,7 +208,7 @@ SOFTWARE.
             NSString *statement =((NSString * (*)(id, SEL))(void *)objc_msgSend)(cls, createSQLSel);
             res = [db executeStatements:statement];
             if (res == NO) {
-                XQLog(@"[dberr]%@", db.lastError);
+                XQDAOLog(@"[dberr]%@", db.lastError);
             }
         }];
         return res;
@@ -217,9 +217,9 @@ SOFTWARE.
 
 - (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes
                 migrationService:(XQMigrationService *)migrationService {
-    XQLog(@">>>>>安装数据库");
+    XQDAOLog(@">>>>>安装数据库");
     [self setupForClasses:classes migrationService:migrationService];
-    XQLog(@"数据库文件是否存在:%@", @([self isDBFileExist]));
+    XQDAOLog(@"数据库文件是否存在:%@", @([self isDBFileExist]));
 #if DEBUG
     if (![self isDBFileExist]) {
         dispatch_async(dispatch_get_main_queue(), ^{

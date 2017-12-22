@@ -35,11 +35,10 @@ SOFTWARE.
 #import "NSObject+XQ_DAO.h"
 #import "XQSQLCondition.h"
 #import "XQFMDBManager.h"
+#import "XQ_DAOUtils.h"
 
 #import <objc/runtime.h>
 #import <FMDB/FMDB.h>
-#import <XQKit/XQKit.h>
-#import <YYKit/YYKit.h>
 
 #define RETURN_IF_CONFIGURATION_EXIST(_SEL) \
 if (self.xq_modelConfiguration._SEL) { \
@@ -79,8 +78,8 @@ static char xq_model_configuration_key;
 
 + (instancetype)configuration {
     XQDBModelConfiguration *configuration = [[self alloc] init];
-    [configuration addUniquesNotNull:@[PROP_TO_STRING(UUID)]];
-    [configuration addUniquesNotNull:@[PROP_TO_STRING(localID)]];
+    [configuration addUniquesNotNull:@[XQDAO_SEL_TO_STRING(UUID)]];
+    [configuration addUniquesNotNull:@[XQDAO_SEL_TO_STRING(localID)]];
     return configuration;
 }
 
@@ -134,8 +133,8 @@ static char xq_model_configuration_key;
 @implementation NSObject (XQ_DAO)
 
 + (void)load {
-    [self swizzleInstanceMethod:NSSelectorFromString(@"setLocalID:")
-                           with:@selector(swizzle_setLocalID:)];
+    [self xq_dao_swizzleInstanceMethod:NSSelectorFromString(@"setLocalID:")
+                                  with:@selector(swizzle_setLocalID:)];
 }
 
 - (void)swizzle_setLocalID:(NSNumber *)localID {
@@ -163,8 +162,8 @@ static char xq_model_configuration_key;
 + (NSArray<NSString *> *)xq_uniquesNotNull {
     RETURN_IF_CONFIGURATION_EXIST(uniquesNotNull)
     CALL_CHILD_IF_EXIST(uniquesNotNull)
-    return @[PROP_TO_STRING(localID),
-             PROP_TO_STRING(UUID)];
+    return @[XQDAO_SEL_TO_STRING(localID),
+             XQDAO_SEL_TO_STRING(UUID)];
 }
 
 + (NSArray<NSString *> *)xq_notNullFields {
@@ -176,13 +175,13 @@ static char xq_model_configuration_key;
 + (NSArray<NSDictionary<NSString *, NSNumber *> *> *)xq_orderFieldInfo {
     RETURN_IF_CONFIGURATION_EXIST(orderFieldInfo)
     CALL_CHILD_IF_EXIST(orderFieldInfo)
-    return @[@{PROP_TO_STRING(localID):@(OrderTypeDESC)}];
+    return @[@{XQDAO_SEL_TO_STRING(localID):@(OrderTypeDESC)}];
 }
 
 + (NSString *)xq_primaryKey {
     RETURN_IF_CONFIGURATION_EXIST(primaryKey)
     CALL_CHILD_IF_EXIST(primaryKey)
-    return PROP_TO_STRING(localID);
+    return XQDAO_SEL_TO_STRING(localID);
 }
 
 + (BOOL)xq_isPrimaryKey:(NSString *)field {
@@ -221,7 +220,7 @@ static char xq_model_configuration_key;
 + (NSDictionary *)xq_fieldDescribeDict {
     NSMutableSet *fieldsSet = [NSMutableSet set];
     NSMutableDictionary *fieldDescribes = [NSMutableDictionary dictionary];
-    fieldDescribes[PROP_TO_STRING(deleted)] = @"DEFAULT 0";
+    fieldDescribes[XQDAO_SEL_TO_STRING(deleted)] = @"DEFAULT 0";
     fieldDescribes[self.xq_primaryKey] = @"PRIMARY KEY AUTOINCREMENT NOT NULL";
     [fieldsSet addObject:self.xq_primaryKey];
     NSArray<NSString *> *fields  = [self xq_uniquesNotNull];
@@ -258,7 +257,7 @@ static char xq_model_configuration_key;
 + (NSDictionary<NSString *, NSNumber *> *)xq_startValueForAutoIncrement {
     RETURN_IF_CONFIGURATION_EXIST(startValueForAutoIncrement)
     CALL_CHILD_IF_EXIST(startValueForAutoIncrement)
-    return @{PROP_TO_STRING(localID):@100};
+    return @{XQDAO_SEL_TO_STRING(localID):@100};
 }
 
 - (XQSQLCondition *)xq_defaultExistCondition {
@@ -305,7 +304,7 @@ static char xq_model_configuration_key;
             continue;//主键不需要设定
         }
         if (nil == [self valueForKey:field]) {
-            XQLogWarn(@"[%@](%@)field error so can't insert this object", [self.class xq_tableName], field);
+            XQDAOLog(@"!!![%@](%@)field error so can't insert this object", [self.class xq_tableName], field);
             return NO;
         }
     }
@@ -348,8 +347,8 @@ static char xq_model_configuration_key;
             value = [value stringValue];
             dbValue = [dbValue stringValue];
             if ([value isEqualToString:dbValue]) {
-                XQLog(@">%@< >%@<", OBJ_CLASS_NAME([self valueForKey:fieldName]), OBJ_CLASS_NAME([dbModel valueForKey:fieldName]));
-                XQLog(@"这里有一个隐患，需要注意 NSNumber 类型和 NSString 类型之间的兼容性，这应该在你定义 EntityModel 时需要注意。可以参见 serverID 和 localID 字段重写的 setter.");
+                XQDAOLog(@">%@< >%@<", XQDAO_OBJ_CLASS_NAME([self valueForKey:fieldName]), XQDAO_OBJ_CLASS_NAME([dbModel valueForKey:fieldName]));
+                XQDAOLog(@"这里有一个隐患，需要注意 NSNumber 类型和 NSString 类型之间的兼容性，这应该在你定义 EntityModel 时需要注意。可以参见 serverID 和 localID 字段重写的 setter.");
                 return NO;
             }
         }
@@ -418,12 +417,10 @@ static char xq_model_configuration_key;
     [self xq_deleteObjectsInTransaction:deleteModels];
     [self _xq_saveObjectsInTransaction:saveModels updateIfExist:updateIfExist];
     if (deleteModels.count > 0) {
-        [self xqNotifyAction:@"DeleteModels" withObject:deleteModels];
-//        [[NSNotificationCenter defaultCenter] notifyModelDelete:deleteModels];
+//        [self xqNotifyAction:@"DeleteModels" withObject:deleteModels];
     }
     if (saveModels.count > 0) {
-        [self xqNotifyAction:@"AddModels" withObject:saveModels];
-//        [[NSNotificationCenter defaultCenter] notifyModelAdd:saveModels];
+//        [self xqNotifyAction:@"AddModels" withObject:saveModels];
     }
 }
 
@@ -435,24 +432,14 @@ static char xq_model_configuration_key;
     if (objects.count == 0) {
         return;
     }
-    NSArray<XQDBBlock> *blocks = [objects xq_compact:^id _Nonnull(__kindof NSObject * _Nonnull object) {
+    NSArray<XQDBBlock> *blocks = xq_dao_compact(objects, ^id(id obj) {
         XQDBBlock block = [self xq_dbBlockForAddObject:^(id model) {
-            [self xq_copyFromObject:object toObject:model];
+            [self xq_copyFromObject:obj toObject:model];
         } updateIfExist:updateIfExist];
         return block;
-    }];
+    });
     [[XQFMDBManager defaultManager] executeBlocksInTransaction:blocks];
 }
-
-//+ (void)target:(id)target performAction:(SEL)action object:(id)object delay:(NSTimeInterval)delay {
-//    [[target class] cancelPreviousPerformRequestsWithTarget:target
-//                                                   selector:action
-//                                                     object:object];
-////    self xqNotifyAction:<#(NSString *)#> withObject:<#(id)#>
-//    [self performSelector:@selector(xqNotifyAction:withObject:)
-//               withObject:object
-//               afterDelay:delay];
-//}
 
 + (void)xq_saveObjectWithBlock:(InitModelBlock)initModelBlock updateIfExist:(BOOL)updateIfExist optType:(DBOptType *)optType {
     
@@ -467,14 +454,11 @@ static char xq_model_configuration_key;
     if (blockModel) {
         switch (*optType) {
             case DBOptTypeAdd:
-//                [self target:[NSNotificationCenter defaultCenter] performAction:@selector(notifyModelAdd:) object:blockModel delay:0.5];
                 break;
             case DBOptTypeDelete:
-//                [self target:[NSNotificationCenter defaultCenter] performAction:@selector(notifyModelDelete:) object:blockModel delay:0.5];
                 break;
             case DBOptTypeUpdate:
             case DBOptTypeNone:
-//                [self target:[NSNotificationCenter defaultCenter] performAction:@selector(notifyModelUpdate:) object:blockModel delay:0.5];
                 break;
         }
     }
@@ -508,7 +492,6 @@ static char xq_model_configuration_key;
 
 - (BOOL)xq_deleteFromDatabase {
     BOOL res = [self.class xq_deleteObject:self];
-//    [[NSNotificationCenter defaultCenter] notifyModelDelete:self];
     return res;
 }
 
@@ -519,9 +502,9 @@ static char xq_model_configuration_key;
 }
 
 + (BOOL)xq_deleteObjectsInTransaction:(NSArray<__kindof NSObject *> *)objects {
-    NSArray<XQDBBlock> *blocks = [objects xq_compact:^id _Nonnull(__kindof NSObject * _Nonnull object) {
-        return [self xq_dbBlockForDeleteObject:object];
-    }];
+    NSArray<XQDBBlock> *blocks = xq_dao_compact(objects, ^id(id obj) {
+        return [self xq_dbBlockForDeleteObject:obj];
+    });
     [[XQFMDBManager defaultManager] executeBlocksInTransaction:blocks];
     if (blocks.count == 0 && objects > 0) {
         return NO;
@@ -541,7 +524,7 @@ static char xq_model_configuration_key;
 }
 
 + (BOOL)xq_deleteWhereLocalIDEqual:(NSNumber *)localID {
-    return [self xq_deleteWhere:PROP_TO_STRING(localID) equal:localID];
+    return [self xq_deleteWhere:XQDAO_SEL_TO_STRING(localID) equal:localID];
 }
 
 + (BOOL)xq_clean {
@@ -555,7 +538,7 @@ static char xq_model_configuration_key;
         res = [db executeUpdate:sql withErrorAndBindings:&error];
         if (res) {
             res = [db executeStatements:[self xq_createSQL]];
-            XQLog(@"Model '%@' clean success", NSStringFromClass(self));
+            XQDAOLog(@"Model '%@' clean success", NSStringFromClass(self));
         }
         return res;
     };
@@ -563,7 +546,7 @@ static char xq_model_configuration_key;
     [[XQFMDBManager defaultManager] executeBlock:block];
     
     if (!res)
-        XQLog(@"db open failure when delete '%@', (%@)", NSStringFromClass(self), error);
+        XQDAOLog(@"db open failure when delete '%@', (%@)", NSStringFromClass(self), error);
     return res;
 }
 
@@ -587,11 +570,11 @@ static char xq_model_configuration_key;
 }
 
 + (instancetype)xq_queryWhereUUIDEqual:(NSString *)UUID {
-    return [self xq_queryWhere:PROP_TO_STRING(UUID) equal:UUID];
+    return [self xq_queryWhere:XQDAO_SEL_TO_STRING(UUID) equal:UUID];
 }
 
 + (instancetype)xq_queryWhereLocalIDEqual:(NSNumber *)localID {
-    return [self xq_queryWhere:PROP_TO_STRING(localID) equal:localID];
+    return [self xq_queryWhere:XQDAO_SEL_TO_STRING(localID) equal:localID];
 }
 
 + (instancetype)xq_queryWhere:(NSString *)field equal:(id)value {
@@ -622,9 +605,9 @@ static char xq_model_configuration_key;
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     NSString *tableName = tableDescribtion[kTableName];
     
-    @weakify(self);
+    __weak typeof(self) _weak_self = self;
     XQDBBlock block = ^BOOL(FMDatabase *db){
-        @strongify(self);
+        __strong typeof(_weak_self) self = _weak_self;
         /*select * from user where localID=1 order by xx DESC limit 0,1*/
         NSMutableString *sql = [NSMutableString stringWithString:@"select "];
         for (NSUInteger index = 0; index < fieldNames.count; ++index) {
@@ -639,7 +622,7 @@ static char xq_model_configuration_key;
             [[self xq_orderFieldInfo] enumerateObjectsUsingBlock:
              ^(NSDictionary<NSString *,NSNumber *> * _Nonnull obj,
                NSUInteger idx, BOOL * _Nonnull stop) {
-                 XQAssert(obj.count == 1);
+                 XQDAOAssert(obj.count == 1);
                 [condition addOrderField:obj.allKeys.firstObject
                                orderType:obj.allValues.firstObject.integerValue];
             }];
@@ -687,13 +670,13 @@ static char xq_model_configuration_key;
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     NSString *tableName = tableDescribtion[kTableName];
     
-    @weakify(self);
+    __weak typeof(self) _weak_self = self;
     return [^BOOL(FMDatabase *db) {
-        @strongify(self);
-        id uuid = [model valueForKey:PROP_TO_STRING(UUID)];
+        __strong typeof(_weak_self) self = _weak_self;
+        id uuid = [model valueForKey:XQDAO_SEL_TO_STRING(UUID)];
         if (!uuid) {
             //强制有 UUID
-            [model setValue:[self xq_rawUUID] forKey:PROP_TO_STRING(UUID)];
+            [model setValue:[self xq_rawUUID] forKey:XQDAO_SEL_TO_STRING(UUID)];
         }
         if (NO == [model xq_willInsert]) {
             return YES;
@@ -721,7 +704,7 @@ static char xq_model_configuration_key;
         if (res) {
             return res;
         }
-        XQLog(@"insert failure:[%@](%@)", db.lastError, sql);
+        XQDAOLog(@"insert failure:[%@](%@)", db.lastError, sql);
 #if !容错
         columnArray = [NSMutableArray array];
         valuesArray = [NSMutableArray array];
@@ -730,11 +713,11 @@ static char xq_model_configuration_key;
         if (updateSql) {
             res = [db executeUpdate:updateSql withArgumentsInArray:valuesArray];
             if (!res) {
-                XQLog(@"update 也 failure:[%@](%@)", db.lastError, updateSql);
-                XQAssert(false);
+                XQDAOLog(@"update 也 failure:[%@](%@)", db.lastError, updateSql);
+                XQDAOAssert(false);
             }
         } else {
-            XQLogWarn(@"!!!update object sql is nil.");
+            XQDAOLog(@"!!!update object sql is nil.");
             res = YES;
         }
 #endif
@@ -813,7 +796,7 @@ static char xq_model_configuration_key;
             count = value.unsignedIntegerValue;
             [rs close];
         } else {
-            XQLog(@"!!! 查询表的 column count 错误!");
+            XQDAOLog(@"!!! 查询表的 column count 错误!");
             return NO;
         }
         return YES;
@@ -871,9 +854,9 @@ static char xq_model_configuration_key;
     WCModelTableDescribtion *tableDescribtion = [self xq_tableDescribtion];
     WCModelDescribtion *fieldNames = tableDescribtion[kFieldNames];
     
-    @weakify(self);
+    __weak typeof(self) _weak_self = self;
     return [^BOOL(FMDatabase *db){
-        @strongify(self);
+        __strong typeof(_weak_self) self = _weak_self;
         NSMutableArray *columnArray = [NSMutableArray array];
         NSMutableArray *valuesArray = [NSMutableArray array];
         
@@ -882,8 +865,8 @@ static char xq_model_configuration_key;
         if (sql) {
             BOOL res = [db executeUpdate:sql withArgumentsInArray:valuesArray];
             if (!res) {
-                XQLog(@"update object error: %@(%@)", db.lastError, sql);
-                XQAssert(false);
+                XQDAOLog(@"update object error: %@(%@)", db.lastError, sql);
+                XQDAOAssert(false);
             }
             return res;
         }
@@ -915,10 +898,10 @@ static char xq_model_configuration_key;
             static SEL s_deletedSEL;
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
-                s_deletedSEL = NSSelectorFromString(PROP_TO_STRING(deleted));
+                s_deletedSEL = NSSelectorFromString(XQDAO_SEL_TO_STRING(deleted));
             });
             if ([model respondsToSelector:s_deletedSEL]) {
-                NSNumber *deleted = [model valueForKey:PROP_TO_STRING(deleted)];
+                NSNumber *deleted = [model valueForKey:XQDAO_SEL_TO_STRING(deleted)];
                 if (deleted.boolValue) {
                     *optType = DBOptTypeDelete;
                     block = [self xq_dbBlockForDeleteObject:model];
@@ -965,7 +948,7 @@ static char xq_model_configuration_key;
         NSError *error;
         BOOL res = [db executeUpdate:sql withErrorAndBindings:&error];
         if (!res) {
-            XQLogWarn(@"db failure when delete '%@', (%@)", NSStringFromClass(self), error);
+            XQDAOLog(@"!!!db failure when delete '%@', (%@)", NSStringFromClass(self), error);
         }
         return res;
     } copy];
@@ -984,13 +967,13 @@ static char xq_model_configuration_key;
     //由于 sqllite 字段不允许大小写重名，因此这里检测重名
     NSMutableSet *duplicateFieldCheck = [NSMutableSet set];
     for (NSString *field in fieldNames) {
-        XQAssert(NO == [duplicateFieldCheck containsObject:field.lowercaseString]);
+        XQDAOAssert(NO == [duplicateFieldCheck containsObject:field.lowercaseString]);
         [duplicateFieldCheck addObject:field.lowercaseString];
     }
 #endif
     NSMutableString *resultSQL =
     [NSMutableString stringWithFormat:@"CREATE TABLE IF NOT EXISTS `%@` (\n", tableName];
-    XQAssert(fieldNames.count == fieldTypes.count);
+    XQDAOAssert(fieldNames.count == fieldTypes.count);
     [fieldNames enumerateObjectsUsingBlock:^(NSString * _Nonnull fieldName, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString *fieldType = [fieldTypes objectAtIndex:idx];
         NSString *formatString = @" `%@` %@ %@,\n";
@@ -1047,8 +1030,8 @@ static char xq_model_configuration_key;
     CFUUIDRef puuid = CFUUIDCreate(nil);
     CFStringRef uuidString = CFUUIDCreateString(nil, puuid);
     uuid = (NSString *)CFBridgingRelease(CFStringCreateCopy(NULL, uuidString));
-    XQCFRelease(puuid);
-    XQCFRelease(uuidString);
+    XQDAOCFRelease(puuid);
+    XQDAOCFRelease(uuidString);
     return uuid;
 }
 
@@ -1174,10 +1157,10 @@ static char xq_model_configuration_key;
             NSString *type = [NSString stringWithUTF8String:cpyDes];
 #if DEBUG
             if (type.length == 1 && ![type isEqualToString:@"@"]) {
-                XQLogWarn(@"field type:%@", type);
+                XQDAOLog(@"field type:%@", type);
             }
 #endif
-            NSString *propType = XQRequiredCast([self xq_propTypeMapping][type], NSString);
+            NSString *propType = XQDAORequiredCast([self xq_propTypeMapping][type], NSString);
             if (propType) {
                 [fieldTypes addObject:propType];
                 NSString *fieldName = [NSString stringWithUTF8String:property_getName(prop)];

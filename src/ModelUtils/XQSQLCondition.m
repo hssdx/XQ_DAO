@@ -30,7 +30,7 @@ SOFTWARE.
 //
 
 #import "XQSQLCondition.h"
-#import <XQKit/XQKit.h>
+#import "XQ_DAOUtils.h"
 
 /**
  *  条件查询允许传入一个dictionary,格式如下：
@@ -158,7 +158,7 @@ NSString *const kIsNot = @"IS NOT";
 }
 
 - (NSString *)getLimitSql {
-    NSDictionary *limitDict = XQRequiredCast([self.condition objectForKey:kLimitKey], NSDictionary);
+    NSDictionary *limitDict = XQDAORequiredCast([self.condition objectForKey:kLimitKey], NSDictionary);
     if ([limitDict count] == 0) {
         return @"";
     }
@@ -174,7 +174,7 @@ NSString *const kIsNot = @"IS NOT";
 
 - (NSString *)getWhereSql {
     NSMutableString *whereSql = [NSMutableString stringWithString:@""];
-    NSArray<NSDictionary *> *whereArray = XQRequiredCast([self.condition objectForKey:kWhereKey], NSArray);
+    NSArray<NSDictionary *> *whereArray = XQDAORequiredCast([self.condition objectForKey:kWhereKey], NSArray);
     if ([whereArray count] == 0) {
         return whereSql;
     }
@@ -198,7 +198,7 @@ NSString *const kIsNot = @"IS NOT";
             } else if ([whereValue isKindOfClass:[NSNull class]]) {
                 [whereSql appendFormat:@" %@ %@ NULL ", whereField, compareStr];
             } else {
-                XQAssert(false);
+                XQDAOAssert(false);
             }
         }
     }];

@@ -27,6 +27,8 @@
 		9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD741F3B50C100136FEC /* XQSQLCondition.m */; };
 		9875FD8B1F3B50C100136FEC /* XQDefaultsStoreBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */; };
 		9875FD8C1F3B50C100136FEC /* XQDefaultsStoreBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */; };
+		98F6323B1FECFEF20057519E /* XQ_DAOUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 98F632391FECFEF20057519E /* XQ_DAOUtils.h */; };
+		98F6323C1FECFEF20057519E /* XQ_DAOUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F6323A1FECFEF20057519E /* XQ_DAOUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +68,8 @@
 		9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XQDefaultsStoreBase.h; sourceTree = "<group>"; };
 		9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XQDefaultsStoreBase.m; sourceTree = "<group>"; };
 		98B193671F5BDBD8003ADE7A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98F632391FECFEF20057519E /* XQ_DAOUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XQ_DAOUtils.h; sourceTree = "<group>"; };
+		98F6323A1FECFEF20057519E /* XQ_DAOUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XQ_DAOUtils.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,12 +153,14 @@
 			isa = PBXGroup;
 			children = (
 				9875FD611F3B50C100136FEC /* CoreEntity */,
-				9875FD651F3B50C100136FEC /* XQModelBlocks.h */,
-				9875FD661F3B50C100136FEC /* XQEntityUtils.h */,
 				9875FD671F3B50C100136FEC /* Migration */,
 				9875FD6D1F3B50C100136FEC /* ModelUtils */,
+				98F632391FECFEF20057519E /* XQ_DAOUtils.h */,
+				98F6323A1FECFEF20057519E /* XQ_DAOUtils.m */,
 				9875FD771F3B50C100136FEC /* XQDefaultsStoreBase.h */,
 				9875FD781F3B50C100136FEC /* XQDefaultsStoreBase.m */,
+				9875FD661F3B50C100136FEC /* XQEntityUtils.h */,
+				9875FD651F3B50C100136FEC /* XQModelBlocks.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -214,6 +220,7 @@
 				9875FD871F3B50C100136FEC /* XQSQLCondition.h in Headers */,
 				9875FD831F3B50C100136FEC /* XQDatabaseQueue.h in Headers */,
 				9815CF4C1F39B22600FD7F6C /* XQ_DAO.h in Headers */,
+				98F6323B1FECFEF20057519E /* XQ_DAOUtils.h in Headers */,
 				9875FD7C1F3B50C100136FEC /* XQModelBlocks.h in Headers */,
 				9875FD7E1F3B50C100136FEC /* XQMigrationItemBase.h in Headers */,
 				9875FD801F3B50C100136FEC /* XQMigrationService.h in Headers */,
@@ -267,7 +274,7 @@
 		9815CF321F39B22500FD7F6C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = com.hssdx;
 				TargetAttributes = {
 					9815CF3A1F39B22500FD7F6C = {
@@ -361,6 +368,7 @@
 				9875FD7F1F3B50C100136FEC /* XQMigrationItemBase.m in Sources */,
 				9875FD811F3B50C100136FEC /* XQMigrationService.m in Sources */,
 				9875FD881F3B50C100136FEC /* XQSQLCondition.m in Sources */,
+				98F6323C1FECFEF20057519E /* XQ_DAOUtils.m in Sources */,
 				9875FD7A1F3B50C100136FEC /* NSObject+XQ_DAO.m in Sources */,
 				9875FD841F3B50C100136FEC /* XQDatabaseQueue.m in Sources */,
 			);
@@ -395,7 +403,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -403,7 +413,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -447,7 +461,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -455,7 +471,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

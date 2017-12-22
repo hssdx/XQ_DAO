@@ -33,7 +33,7 @@ SOFTWARE.
 #import "XQMigrationItemBase.h"
 #import "XQFMDBManager.h"
 #import <FMDB/FMDB.h>
-#import <XQKit/XQKit.h>
+#import "XQ_DAOUtils.h"
 
 @interface XQMigrationService()
 
@@ -51,7 +51,7 @@ SOFTWARE.
 }
 
 - (void)addMigrationItem:(XQMigrationItemBase *)migrationItem version:(NSInteger)version {
-    XQAssert(migrationItem && version > 1); //从版本 2开始
+    XQDAOAssert(migrationItem && version > 1); //从版本 2开始
     [_migrationOptDict setObject:migrationItem forKey:@(version)];
 }
 
@@ -65,7 +65,7 @@ SOFTWARE.
         FMResultSet *result = [db executeQuery:sql];
         while ([result next]) {
             result = [result objectForColumn:@"sql"];
-            XQLog(@"[%@]", result);
+            XQDAOLog(@"[%@]", result);
         }
         if (result) {
             [result close];
@@ -96,11 +96,11 @@ SOFTWARE.
                     break;
                 case MOTDeleteField:
                     //TODO: delete field
-                    XQAssert(false);
+                    XQDAOAssert(false);
                     break;
                 case MOTModifyField:
                     //TODO: modeify field
-                    XQAssert(false);
+                    XQDAOAssert(false);
                     break;
                 case MOTAddField:
                 {
@@ -115,12 +115,12 @@ SOFTWARE.
                     }
                     break;
             }
-            XQLog(@"opt sql:(%@)", optSql);
+            XQDAOLog(@"opt sql:(%@)", optSql);
             XQDBBlock block = ^BOOL(FMDatabase *db){
                 NSError *error;
                 BOOL res = [db executeUpdate:optSql withErrorAndBindings:&error];
                 if (!res) {
-                    XQLog(@"db update error:(%@)[%@]", error, optSql);
+                    XQDAOLog(@"db update error:(%@)[%@]", error, optSql);
                 }
                 return res;
             };
@@ -129,7 +129,7 @@ SOFTWARE.
             //[self showTable:optItem.table];
 #endif
         }
-        XQLog(@"DB migration (%d)to(%d) success!", (int)currentDBVersion-1, (int)currentDBVersion);
+        XQDAOLog(@"DB migration (%d)to(%d) success!", (int)currentDBVersion-1, (int)currentDBVersion);
     }
 }
 

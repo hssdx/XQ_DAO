@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "XQ_DAO"
-  s.version      = "1.2"
+  s.version      = "1.3-light"
   s.summary      = "XQ_DAO base on FMDB"
 
   s.description  = <<-DESC
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.framework = "CoreFoundation"
   s.requires_arc = true
 
-  s.dependency "XQKit"
+  # s.dependency "XQKit"
   s.dependency "FMDB"
 
 end

@@ -250,4 +250,5 @@ FP_MUTABLE_ARRAY_PROPERTY(_COPY, _PROP_NAME, NSNumber)
 @property (_COPY, nonatomic) NSMutableDictionary * _PROP_NAME; \
 @property (_COPY, nonatomic) NSString * _PROP_NAME##Json
 
+
 #endif /* XQEntityUtils_h */

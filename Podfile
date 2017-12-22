@@ -9,7 +9,7 @@ target 'XQ_DAO' do
     # pod 'YYKit' #, :git => 'https://github.com/ibireme/YYKit.git'
     # pod 'MBProgressHUD'
     # pod 'Masonry'
-    pod 'XQKit' #, :git => 'https://github.com/hssdx/XQKit.git'
+    # pod 'XQKit' #, :git => 'https://github.com/hssdx/XQKit.git'
     pod 'FMDB'
 end
 
