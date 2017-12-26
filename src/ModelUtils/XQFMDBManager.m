@@ -131,6 +131,9 @@ SOFTWARE.
 }
 
 - (void)executeBlock:(XQDBBlock)block {
+    if (!block) {
+        return;
+    }
     if ([self.dbQueue isNestedQueue]){
         if ([self.db open])
             block(self.db);
@@ -146,6 +149,9 @@ SOFTWARE.
 }
 
 - (void)executeBlocksInTransaction:(NSArray<XQDBBlock> *)blocks {
+    if (blocks.count == 0) {
+        return;
+    }
     if ([self.dbQueue isNestedQueue]) {
         XQDAOLog(@"在一个自身的 db queue 里未退出，无法启动事务操作模式");
         if ([self.db open]) {

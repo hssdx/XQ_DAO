@@ -47,6 +47,7 @@ traversingFiles "."
 
 mkdir $project_name
 touch $result_file
+rm -f $result_file
 echo "/* " > $result_file
 cat "./LICENSE" >> $result_file
 echo " */" >> $result_file
