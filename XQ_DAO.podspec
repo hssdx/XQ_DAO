@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "XQ_DAO"
-  s.version      = "1.4-light"
+  s.version      = "1.5-light"
   s.summary      = "XQ_DAO base on FMDB"
 
   s.description  = <<-DESC

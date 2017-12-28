@@ -304,7 +304,7 @@ static char xq_model_configuration_key;
             continue;//主键不需要设定
         }
         if (nil == [self valueForKey:field]) {
-            XQDAOLog(@"!!![%@](%@)field error so can't insert this object", [self.class xq_tableName], field);
+            XQDAOLog(@"[xq_dao]!!![%@](%@)field error so can't insert this object", [self.class xq_tableName], field);
             return NO;
         }
     }
@@ -347,8 +347,8 @@ static char xq_model_configuration_key;
             value = [value stringValue];
             dbValue = [dbValue stringValue];
             if ([value isEqualToString:dbValue]) {
-                XQDAOLog(@">%@< >%@<", XQDAO_OBJ_CLASS_NAME([self valueForKey:fieldName]), XQDAO_OBJ_CLASS_NAME([dbModel valueForKey:fieldName]));
-                XQDAOLog(@"这里有一个隐患，需要注意 NSNumber 类型和 NSString 类型之间的兼容性，这应该在你定义 EntityModel 时需要注意。可以参见 serverID 和 localID 字段重写的 setter.");
+                XQDAOLog(@"[xq_dao]>%@< >%@<", XQDAO_OBJ_CLASS_NAME([self valueForKey:fieldName]), XQDAO_OBJ_CLASS_NAME([dbModel valueForKey:fieldName]));
+                XQDAOLog(@"[xq_dao]这里有一个隐患，需要注意 NSNumber 类型和 NSString 类型之间的兼容性，这应该在你定义 EntityModel 时需要注意。可以参见 serverID 和 localID 字段重写的 setter.");
                 return NO;
             }
         }
@@ -538,7 +538,7 @@ static char xq_model_configuration_key;
         res = [db executeUpdate:sql withErrorAndBindings:&error];
         if (res) {
             res = [db executeStatements:[self xq_createSQL]];
-            XQDAOLog(@"Model '%@' clean success", NSStringFromClass(self));
+            XQDAOLog(@"[xq_dao]Model '%@' clean success", NSStringFromClass(self));
         }
         return res;
     };
@@ -546,7 +546,7 @@ static char xq_model_configuration_key;
     [[XQFMDBManager defaultManager] executeBlock:block];
     
     if (!res)
-        XQDAOLog(@"db open failure when delete '%@', (%@)", NSStringFromClass(self), error);
+        XQDAOLog(@"[xq_dao]db open failure when delete '%@', (%@)", NSStringFromClass(self), error);
     return res;
 }
 
@@ -628,11 +628,12 @@ static char xq_model_configuration_key;
             }];
         }
         
-        NSString *conditionSQL = [condition conditionSQL];
+        NSMutableArray *argValues = [NSMutableArray array];
+        NSString *conditionSQL = [condition conditionArgValues:argValues];
         if ([conditionSQL length] > 0) {
             [sql appendString:conditionSQL];
         }
-        FMResultSet * rs = [db executeQuery:sql];
+        FMResultSet * rs = [db executeQuery:sql withArgumentsInArray:argValues];
         while ([rs next]) {
             NSObject *object = [[self alloc] init];
             
@@ -704,7 +705,7 @@ static char xq_model_configuration_key;
         if (res) {
             return res;
         }
-        XQDAOLog(@"insert failure:[%@](%@)", db.lastError, sql);
+        XQDAOLog(@"[xq_dao]insert failure:[%@](%@)", db.lastError, sql);
 #if !容错
         columnArray = [NSMutableArray array];
         valuesArray = [NSMutableArray array];
@@ -713,11 +714,11 @@ static char xq_model_configuration_key;
         if (updateSql) {
             res = [db executeUpdate:updateSql withArgumentsInArray:valuesArray];
             if (!res) {
-                XQDAOLog(@"update 也 failure:[%@](%@)", db.lastError, updateSql);
+                XQDAOLog(@"[xq_dao]update 也 failure:[%@](%@)", db.lastError, updateSql);
                 XQDAOAssert(false);
             }
         } else {
-            XQDAOLog(@"!!!update object sql is nil.");
+            XQDAOLog(@"[xq_dao]!!!update object sql is nil.");
             res = YES;
         }
 #endif
@@ -785,18 +786,19 @@ static char xq_model_configuration_key;
     XQDBBlock block = ^BOOL(FMDatabase *db){
         NSMutableString *sql = [NSMutableString string];
         [sql appendFormat:@"select count(*) from %@ ", tableName];
-        NSString *whereSql = [condition conditionSQL];
+        NSMutableArray *argValues = [NSMutableArray array];
+        NSString *whereSql = [condition conditionArgValues:argValues];
         if (whereSql) {
             [sql appendString:whereSql];
         }
-        FMResultSet * rs = [db executeQuery:sql];
+        FMResultSet * rs = [db executeQuery:sql withArgumentsInArray:argValues];
         BOOL res = [rs next];
         if (res) {
             NSNumber *value = [rs objectForColumnIndex:0];
             count = value.unsignedIntegerValue;
             [rs close];
         } else {
-            XQDAOLog(@"!!! 查询表的 column count 错误!");
+            XQDAOLog(@"[xq_dao]!!! 查询表的 column count 错误!");
             return NO;
         }
         return YES;
@@ -812,11 +814,11 @@ static char xq_model_configuration_key;
 }
 
 + (NSString *)xq_updateSqlForModel:(NSObject *)model
-                        dbModel:(NSObject *)dbModel
-                     fieldNames:(WCModelDescribtion *)fieldNames
-                    columnArray:(NSMutableArray *)columnArray
-                    valuesArray:(NSMutableArray *)valuesArray
-                      condition:(XQSQLCondition *)condition {
+                           dbModel:(NSObject *)dbModel
+                        fieldNames:(WCModelDescribtion *)fieldNames
+                       columnArray:(NSMutableArray *)columnArray
+                       valuesArray:(NSMutableArray *)valuesArray
+                         condition:(XQSQLCondition *)condition {
     NSString *tableName = NSStringFromClass(self.class);
     [fieldNames enumerateObjectsUsingBlock:
      ^(NSString *_Nonnull fieldName, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -837,13 +839,15 @@ static char xq_model_configuration_key;
              }
          }
      }];
-    if (valuesArray.count != 0) {
+    if (valuesArray.count > 0) {
         NSString *columnSql = [[columnArray valueForKey:@"description"] componentsJoinedByString:@","];
-        NSString *whereSql = [condition conditionSQL];
+        NSMutableArray *argValues = [NSMutableArray array];
+        NSString *whereSql = [condition conditionArgValues:argValues];
         NSMutableString *sql = [NSMutableString string];
         [sql appendFormat:@"UPDATE %@ SET %@ ", tableName, columnSql];
         if (whereSql) {
             [sql appendString:whereSql];
+            [valuesArray addObjectsFromArray:argValues];
         }
         return sql;
     }
@@ -865,7 +869,7 @@ static char xq_model_configuration_key;
         if (sql) {
             BOOL res = [db executeUpdate:sql withArgumentsInArray:valuesArray];
             if (!res) {
-                XQDAOLog(@"update object error: %@(%@)", db.lastError, sql);
+                XQDAOLog(@"[xq_dao]update object error: %@(%@)", db.lastError, sql);
                 XQDAOAssert(false);
             }
             return res;
@@ -948,7 +952,7 @@ static char xq_model_configuration_key;
         NSError *error;
         BOOL res = [db executeUpdate:sql withErrorAndBindings:&error];
         if (!res) {
-            XQDAOLog(@"!!!db failure when delete '%@', (%@)", NSStringFromClass(self), error);
+            XQDAOLog(@"[xq_dao]!!!db failure when delete '%@', (%@)", NSStringFromClass(self), error);
         }
         return res;
     } copy];
@@ -1157,7 +1161,7 @@ static char xq_model_configuration_key;
             NSString *type = [NSString stringWithUTF8String:cpyDes];
 #if DEBUG
             if (type.length == 1 && ![type isEqualToString:@"@"]) {
-                XQDAOLog(@"field type:%@", type);
+                XQDAOLog(@"[xq_dao]field type:%@", type);
             }
 #endif
             NSString *propType = XQDAORequiredCast([self xq_propTypeMapping][type], NSString);

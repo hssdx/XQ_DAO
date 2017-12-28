@@ -173,6 +173,12 @@ NSString *const kIsNot = @"IS NOT";
 }
 
 - (NSString *)getWhereSql {
+    return [self getWhereArgValues:nil];
+}
+
+- (NSString *)getWhereArgValues:(NSMutableArray *)values {
+    [values removeAllObjects];
+    
     NSMutableString *whereSql = [NSMutableString stringWithString:@""];
     NSArray<NSDictionary *> *whereArray = XQDAORequiredCast([self.condition objectForKey:kWhereKey], NSArray);
     if ([whereArray count] == 0) {
@@ -191,14 +197,26 @@ NSString *const kIsNot = @"IS NOT";
             [whereSql appendFormat:@"%@", logicCode];
         }
         if (whereField.length > 0) {
-            if ([whereValue isKindOfClass:[NSString class]]) {
-                [whereSql appendFormat:@" %@ %@ '%@' ", whereField, compareStr, whereValue];
-            } else if ([whereValue isKindOfClass:[NSNumber class]]){
-                [whereSql appendFormat:@" %@ %@ %@ ", whereField, compareStr, whereValue];
-            } else if ([whereValue isKindOfClass:[NSNull class]]) {
-                [whereSql appendFormat:@" %@ %@ NULL ", whereField, compareStr];
+            if (values) {
+                if ([whereValue isKindOfClass:[NSString class]] ||
+                    [whereValue isKindOfClass:[NSNumber class]]) {
+                    [whereSql appendFormat:@" %@ %@ ? ", whereField, compareStr];
+                    [values addObject:whereValue];
+                } else if ([whereValue isKindOfClass:[NSNull class]]) {
+                    [whereSql appendFormat:@" %@ %@ NULL ", whereField, compareStr];
+                } else {
+                    XQDAOAssert(false);
+                }
             } else {
-                XQDAOAssert(false);
+                if ([whereValue isKindOfClass:[NSString class]]) {
+                    [whereSql appendFormat:@" %@ %@ '%@' ", whereField, compareStr, whereValue];
+                } else if ([whereValue isKindOfClass:[NSNumber class]]){
+                    [whereSql appendFormat:@" %@ %@ %@ ", whereField, compareStr, whereValue];
+                } else if ([whereValue isKindOfClass:[NSNull class]]) {
+                    [whereSql appendFormat:@" %@ %@ NULL ", whereField, compareStr];
+                } else {
+                    XQDAOAssert(false);
+                }
             }
         }
     }];
@@ -348,8 +366,17 @@ NSString *const kIsNot = @"IS NOT";
 }
 
 - (NSString *)conditionSQL {
+    return [self conditionArgValues:nil];
+}
+
+- (NSString *)conditionArgValues:(NSMutableArray *)values {
     NSMutableString *sql = [NSMutableString string];
-    [sql appendString:[self getWhereSql]];
+    if (values) {
+        [sql appendString:[self getWhereArgValues:values]];
+    } else {
+        XQDAOLog(@"[xq_dao]!!!请传入有效的 values 参数，否则有 SQL 注入风险");
+        [sql appendString:[self getWhereSql]];
+    }
     if (self.orderSQLs.count > 0) {
         [sql appendString:@" ORDER BY "];
         [self.orderSQLs enumerateObjectsUsingBlock:
@@ -358,7 +385,7 @@ NSString *const kIsNot = @"IS NOT";
              if (idx < self.orderSQLs.count - 1) {
                  [sql appendString:@", "];
              }
-        }];
+         }];
     }
     [sql appendString:[self getLimitSql]];
     return sql;

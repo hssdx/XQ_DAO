@@ -65,7 +65,7 @@ SOFTWARE.
         FMResultSet *result = [db executeQuery:sql];
         while ([result next]) {
             result = [result objectForColumn:@"sql"];
-            XQDAOLog(@"[%@]", result);
+            XQDAOLog(@"[xq_dao][%@]", result);
         }
         if (result) {
             [result close];
@@ -115,12 +115,12 @@ SOFTWARE.
                     }
                     break;
             }
-            XQDAOLog(@"opt sql:(%@)", optSql);
+            XQDAOLog(@"[xq_dao]opt sql:(%@)", optSql);
             XQDBBlock block = ^BOOL(FMDatabase *db){
                 NSError *error;
                 BOOL res = [db executeUpdate:optSql withErrorAndBindings:&error];
                 if (!res) {
-                    XQDAOLog(@"db update error:(%@)[%@]", error, optSql);
+                    XQDAOLog(@"[xq_dao]db update error:(%@)[%@]", error, optSql);
                 }
                 return res;
             };
@@ -129,7 +129,7 @@ SOFTWARE.
             //[self showTable:optItem.table];
 #endif
         }
-        XQDAOLog(@"DB migration (%d)to(%d) success!", (int)currentDBVersion-1, (int)currentDBVersion);
+        XQDAOLog(@"[xq_dao]DB migration (%d)to(%d) success!", (int)currentDBVersion-1, (int)currentDBVersion);
     }
 }
 

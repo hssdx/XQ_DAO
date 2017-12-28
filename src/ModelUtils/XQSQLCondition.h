@@ -87,7 +87,8 @@ typedef NS_ENUM(NSInteger, OrderType) {
 - (instancetype)orWhere:(NSString *)field is:(id)value;
 - (instancetype)orWhere:(NSString *)field isNot:(id)value;
 
-- (NSString *)conditionSQL;
+- (NSString *)conditionSQL __attribute__((deprecated("有 SQL注入风险，请使用 conditionArgValues: 替代")));
+- (NSString *)conditionArgValues:(NSMutableArray *)values;
 - (NSString *)whereAndLimitSQL;
 - (void)addOrderField:(NSString *)field orderType:(OrderType)orderType;
 

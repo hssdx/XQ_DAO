@@ -138,7 +138,7 @@ SOFTWARE.
         if ([self.db open])
             block(self.db);
         else
-            XQDAOLog(@"can't open");
+            XQDAOLog(@"[xq_dao]can't open");
     }
     else{
         [self.dbQueue inDatabase:^(FMDatabase *db){
@@ -153,14 +153,14 @@ SOFTWARE.
         return;
     }
     if ([self.dbQueue isNestedQueue]) {
-        XQDAOLog(@"在一个自身的 db queue 里未退出，无法启动事务操作模式");
+        XQDAOLog(@"[xq_dao]在一个自身的 db queue 里未退出，无法启动事务操作模式");
         if ([self.db open]) {
             [blocks enumerateObjectsUsingBlock:^(XQDBBlock  _Nonnull block, NSUInteger idx, BOOL * _Nonnull stop) {
                 block(self.db);
             }];
         }
         else {
-            XQDAOLog(@"can't open");
+            XQDAOLog(@"[xq_dao]can't open");
         }
     }
     else {
@@ -204,9 +204,9 @@ SOFTWARE.
             [migrationService startMigrationFromVersion:fromVersion toVersion:toVersion];
             db.userVersion = toVersion;
             self.version = toVersion;
-            XQDAOLog(@"database migration!");
+            XQDAOLog(@"[xq_dao]database migration!");
         } else {
-            XQDAOLog(@"database version:%d", fromVersion);
+            XQDAOLog(@"[xq_dao]database version:%d", fromVersion);
         }
         [classes enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             Class cls = NSClassFromString(obj);
@@ -214,7 +214,7 @@ SOFTWARE.
             NSString *statement =((NSString * (*)(id, SEL))(void *)objc_msgSend)(cls, createSQLSel);
             res = [db executeStatements:statement];
             if (res == NO) {
-                XQDAOLog(@"[dberr]%@", db.lastError);
+                XQDAOLog(@"[xq_dao][dberr]%@", db.lastError);
             }
         }];
         return res;
@@ -223,9 +223,9 @@ SOFTWARE.
 
 - (void)setupDatabaseWithClasses:(NSArray<NSString *> *)classes
                 migrationService:(XQMigrationService *)migrationService {
-    XQDAOLog(@">>>>>安装数据库");
+    XQDAOLog(@"[xq_dao]>>>>>安装数据库");
     [self setupForClasses:classes migrationService:migrationService];
-    XQDAOLog(@"数据库文件是否存在:%@", @([self isDBFileExist]));
+    XQDAOLog(@"[xq_dao]数据库文件是否存在:%@", @([self isDBFileExist]));
 #if DEBUG
     if (![self isDBFileExist]) {
         dispatch_async(dispatch_get_main_queue(), ^{
