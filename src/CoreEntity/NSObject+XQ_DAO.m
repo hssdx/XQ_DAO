@@ -1106,18 +1106,22 @@ static char xq_model_configuration_key;
 }
 
 + (NSDictionary *)xq_propTypeMapping {
+    //https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html#//apple_ref/doc/uid/TP40008048-CH101
+    
     static NSDictionary *s_mapping;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         s_mapping = @{@"NSString":@"TEXT",
                       @"NSNumber":@"INTEGER",
-                      @"f":@"REAL",
+                      @"c":@"INTEGER",
                       @"d":@"REAL",
-                      @"B":@"INTEGER",
-                      @"s":@"INTEGER",
                       @"i":@"INTEGER",
-                      @"q":@"INTEGER",
+                      @"f":@"REAL",
+                      @"l":@"INTEGER",
+                      @"s":@"INTEGER",
                       @"I":@"INTEGER",
+                      @"B":@"INTEGER",
+                      @"q":@"INTEGER",
                       @"Q":@"INTEGER",
                       };
     });

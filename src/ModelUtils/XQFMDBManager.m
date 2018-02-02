@@ -135,10 +135,13 @@ SOFTWARE.
         return;
     }
     if ([self.dbQueue isNestedQueue]){
-        if ([self.db open])
+        if ([self.db open]) {
             block(self.db);
-        else
+            [self.db close];
+        }
+        else {
             XQDAOLog(@"[xq_dao]can't open");
+        }
     }
     else{
         [self.dbQueue inDatabase:^(FMDatabase *db){
@@ -158,6 +161,7 @@ SOFTWARE.
             [blocks enumerateObjectsUsingBlock:^(XQDBBlock  _Nonnull block, NSUInteger idx, BOOL * _Nonnull stop) {
                 block(self.db);
             }];
+            [self.db close];
         }
         else {
             XQDAOLog(@"[xq_dao]can't open");

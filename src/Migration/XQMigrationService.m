@@ -81,7 +81,9 @@ SOFTWARE.
      sqllite 只支持删除表，重命名表，添加额外的列，除此之外，不支持其他alter命令
      */
     NSDictionary *fieldTypeMap = @{@(FieldTypeNumber):@"INTEGER",
-                                   @(FieldTypeString):@"TEXT"};
+                                   @(FieldTypeString):@"TEXT",
+                                   @(FieldTypeInt):@"INTEGER",
+                                   @(FieldTypeFloat):@"REAL"};
     
     NSInteger currentDBVersion = fromVersion;
     NSInteger targetDBVersion = toVersion;

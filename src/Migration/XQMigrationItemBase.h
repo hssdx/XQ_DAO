@@ -42,6 +42,8 @@ typedef NS_ENUM(NSInteger, MigrationOperationType) {
 typedef NS_ENUM(NSInteger, FieldType) {
     FieldTypeNumber,
     FieldTypeString,
+    FieldTypeInt,
+    FieldTypeFloat,
 };
 
 @interface FPMigrationOperationItem : NSObject
