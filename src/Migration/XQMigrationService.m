@@ -32,7 +32,7 @@ SOFTWARE.
 #import "XQMigrationService.h"
 #import "XQMigrationItemBase.h"
 #import "XQFMDBManager.h"
-#import <FMDB/FMDB.h>
+#import <FMDB.h>
 #import "XQ_DAOUtils.h"
 
 @interface XQMigrationService()
@@ -64,7 +64,7 @@ SOFTWARE.
          */
         FMResultSet *result = [db executeQuery:sql];
         while ([result next]) {
-            result = [result objectForColumn:@"sql"];
+            result = [result objectForColumnName:@"sql"];
             XQDAOLog(@"[xq_dao][%@]", result);
         }
         if (result) {

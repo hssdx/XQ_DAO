@@ -30,7 +30,7 @@ SOFTWARE.
 //
 
 #import "XQDatabaseQueue.h"
-#import <FMDB/FMDatabase.h>
+#import <fmdb/FMDatabase.h>
 
 #if FMDB_SQLITE_STANDALONE
 #import <sqlite3/sqlite3.h>
@@ -38,22 +38,16 @@ SOFTWARE.
 #import <sqlite3.h>
 #endif
 
-static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpecificKey;
 
-@interface XQDatabaseQueue () {
-    dispatch_queue_t    _queue;
-    FMDatabase          *_db;
-}
-@end
+static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpecificKey;
 
 @implementation XQDatabaseQueue
 
-- (BOOL)isNestedQueue {
-    XQDatabaseQueue *currentSyncQueue = (__bridge id)dispatch_get_specific(kXQ_DispatchQueueSpecificKey);
-    return currentSyncQueue == self;
-}
+@synthesize path = _path;
+@synthesize openFlags = _openFlags;
 
-+ (instancetype)databaseQueueWithPath:(NSString *)aPath {
++ (instancetype)databaseQueueWithPath:(NSString*)aPath {
+    
     XQDatabaseQueue *q = [[self alloc] initWithPath:aPath];
     
     FMDBAutorelease(q);
@@ -61,11 +55,8 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     return q;
 }
 
-+ (instancetype)databaseQueueWithURL:(NSURL *)url {
-    return [self databaseQueueWithPath:url.path];
-}
-
-+ (instancetype)databaseQueueWithPath:(NSString *)aPath flags:(int)openFlags {
++ (instancetype)databaseQueueWithPath:(NSString*)aPath flags:(int)openFlags {
+    
     XQDatabaseQueue *q = [[self alloc] initWithPath:aPath flags:openFlags];
     
     FMDBAutorelease(q);
@@ -73,19 +64,12 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     return q;
 }
 
-+ (instancetype)databaseQueueWithURL:(NSURL *)url flags:(int)openFlags {
-    return [self databaseQueueWithPath:url.path flags:openFlags];
-}
-
 + (Class)databaseClass {
     return [FMDatabase class];
 }
 
-- (instancetype)initWithURL:(NSURL *)url flags:(int)openFlags vfs:(NSString *)vfsName {
-    return [self initWithPath:url.path flags:openFlags vfs:vfsName];
-}
-
 - (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags vfs:(NSString *)vfsName {
+    
     self = [super init];
     
     if (self != nil) {
@@ -109,25 +93,17 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
         _queue = dispatch_queue_create([[NSString stringWithFormat:@"fmdb.%@", self] UTF8String], NULL);
         dispatch_queue_set_specific(_queue, kXQ_DispatchQueueSpecificKey, (__bridge void *)self, NULL);
         _openFlags = openFlags;
-        _vfsName = [vfsName copy];
     }
     
     return self;
 }
 
-- (instancetype)initWithPath:(NSString *)aPath flags:(int)openFlags {
+- (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags {
     return [self initWithPath:aPath flags:openFlags vfs:nil];
 }
 
-- (instancetype)initWithURL:(NSURL *)url flags:(int)openFlags {
-    return [self initWithPath:url.path flags:openFlags vfs:nil];
-}
-
-- (instancetype)initWithURL:(NSURL *)url {
-    return [self initWithPath:url.path];
-}
-
-- (instancetype)initWithPath:(NSString *)aPath {
+- (instancetype)initWithPath:(NSString*)aPath {
+    
     // default flags for sqlite3_open
     return [self initWithPath:aPath flags:SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE vfs:nil];
 }
@@ -136,11 +112,11 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     return [self initWithPath:nil];
 }
 
-    
+
 - (void)dealloc {
+    
     FMDBRelease(_db);
     FMDBRelease(_path);
-    FMDBRelease(_vfsName);
     
     if (_queue) {
         FMDBDispatchQueueRelease(_queue);
@@ -161,16 +137,12 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     FMDBRelease(self);
 }
 
-- (void)interrupt {
-    [[self database] interrupt];
-}
-
 - (FMDatabase*)database {
     if (!_db) {
-       _db = FMDBReturnRetained([[[self class] databaseClass] databaseWithPath:_path]);
+        _db = FMDBReturnRetained([FMDatabase databaseWithPath:_path]);
         
 #if SQLITE_VERSION_NUMBER >= 3005000
-        BOOL success = [_db openWithFlags:_openFlags vfs:_vfsName];
+        BOOL success = [_db openWithFlags:_openFlags];
 #else
         BOOL success = [_db open];
 #endif
@@ -186,12 +158,10 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
 }
 
 - (void)inDatabase:(void (^)(FMDatabase *db))block {
-#ifndef NDEBUG
     /* Get the currently executing queue (which should probably be nil, but in theory could be another DB queue
      * and then check it against self to make sure we're not about to deadlock. */
     XQDatabaseQueue *currentSyncQueue = (__bridge id)dispatch_get_specific(kXQ_DispatchQueueSpecificKey);
     assert(currentSyncQueue != self && "inDatabase: was called reentrantly on the same queue, which would lead to a deadlock");
-#endif
     
     FMDBRetain(self);
     
@@ -216,9 +186,10 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     FMDBRelease(self);
 }
 
+
 - (void)beginTransaction:(BOOL)useDeferred withBlock:(void (^)(FMDatabase *db, BOOL *rollback))block {
     FMDBRetain(self);
-    dispatch_sync(_queue, ^() { 
+    dispatch_sync(_queue, ^() {
         
         BOOL shouldRollback = NO;
         
@@ -255,7 +226,7 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     static unsigned long savePointIdx = 0;
     __block NSError *err = 0x00;
     FMDBRetain(self);
-    dispatch_sync(_queue, ^() { 
+    dispatch_sync(_queue, ^() {
         
         NSString *name = [NSString stringWithFormat:@"savePoint%ld", savePointIdx++];
         
@@ -280,6 +251,11 @@ static const void * const kXQ_DispatchQueueSpecificKey = &kXQ_DispatchQueueSpeci
     if (self.logsErrors) NSLog(@"%@", errorMessage);
     return [NSError errorWithDomain:@"FMDatabase" code:0 userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
 #endif
+}
+
+- (BOOL)isNestedQueue {
+    XQDatabaseQueue *currentSyncQueue = (__bridge id)dispatch_get_specific(kXQ_DispatchQueueSpecificKey);
+    return currentSyncQueue == self;
 }
 
 @end

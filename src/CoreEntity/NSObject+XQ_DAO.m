@@ -638,7 +638,7 @@ static char xq_model_configuration_key;
             NSObject *object = [[self alloc] init];
             
             for (NSString *name in fieldNames) {
-                id value = [rs objectForColumn:name];
+                id value = [rs objectForColumnName:name];
                 if (value && NO == [value isKindOfClass:[NSNull class]]) {
                     [object setValue:value forKey:name];
                 }

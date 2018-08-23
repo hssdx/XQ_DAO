@@ -21,6 +21,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   # s.dependency "XQKit"
-  s.dependency "FMDB"
+  s.dependency 'FMDB' #, '2.7.4'
 
 end
