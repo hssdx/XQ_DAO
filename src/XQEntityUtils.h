@@ -49,7 +49,7 @@ _ARRAY = [stringArr bk_map:^id _Nonnull(NSString * _Nonnull obj) { \
 @synthesize _ARRAY##String = _##_ARRAY##String; \
 \
 - (NSString *)_ARRAY##String { \
-    return [_##_ARRAY modelToJSONString]; \
+    return [_##_ARRAY yy_modelToJSONString]; \
 } \
 \
 - (void)_ARRAY_SETTER##String:(__kindof NSString *)_ARRAY##String { \
@@ -67,7 +67,7 @@ _##_ARRAY = [[_##_ARRAY##String jsonValueDecoded] mutableCopy]; \
 @synthesize _DICT##Json = _##_DICT##Json;  \
 \
 - (__kindof NSString *)_DICT##Json { \
-    return [_##_DICT modelToJSONString]; \
+    return [_##_DICT yy_modelToJSONString]; \
 } \
 \
 - (void)_DICT_SETTER##Json:(__kindof NSString *)_DICT##Json { \
@@ -85,7 +85,7 @@ _##_ARRAY = [[_##_ARRAY##String jsonValueDecoded] mutableCopy]; \
 @synthesize _ARRAY##String = _##_ARRAY##String; \
 \
 - (void)_ARRAY_SETTER:(NSArray *)_ARRAY { \
-    _##_ARRAY##String = [_ARRAY modelToJSONString]; \
+    _##_ARRAY##String = [_ARRAY yy_modelToJSONString]; \
     _##_ARRAY = [_ARRAY copy]; \
 } \
 \
@@ -103,7 +103,7 @@ _##_ARRAY = [[_##_ARRAY##String jsonValueDecoded] mutableCopy]; \
 \
 - (NSString *)_ARRAY##String { \
     if (_##_ARRAY##String.length == 0 && _##_ARRAY.count > 0) { \
-        _##_ARRAY##String = [_##_ARRAY modelToJSONString]; \
+        _##_ARRAY##String = [_##_ARRAY yy_modelToJSONString]; \
     } \
     return _##_ARRAY##String; \
 }
@@ -188,7 +188,7 @@ _##_ARRAY = [[_##_ARRAY##String jsonValueDecoded] mutableCopy]; \
 @synthesize _DICT##Json = _##_DICT##Json;  \
 \
 - (void)_DICT_SETTER:(__kindof NSDictionary *)_DICT { \
-    _##_DICT##Json = [_DICT modelToJSONString]; \
+    _##_DICT##Json = [_DICT yy_modelToJSONString]; \
     _##_DICT = _DICT; \
 } \
 \
@@ -201,7 +201,7 @@ _##_ARRAY = [[_##_ARRAY##String jsonValueDecoded] mutableCopy]; \
 \
 - (__kindof NSString *)_DICT##Json { \
     if (_##_DICT##Json.length == 0 && _##_DICT) { \
-        _##_DICT##Json = [_##_DICT modelToJSONString]; \
+        _##_DICT##Json = [_##_DICT yy_modelToJSONString]; \
     } \
     return _##_DICT##Json; \
 } \
